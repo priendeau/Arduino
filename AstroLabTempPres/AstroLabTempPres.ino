@@ -17,6 +17,7 @@
 #define DHT11_MAX_LOOP          500
 #define DHT11_SLEEP_INTERVAL    15 
 #define DHT11_LOOP_TIMER        120000
+#define WAIT_LONG_DELAY         2500
 #define USING_GY91_ECU          1
 #define USING_OLED_SSD1306      1
 #define NOT_SPI_DEVICE          1
@@ -29,7 +30,7 @@ to save space in memory of MCU .
 //#define SERIAL_MSG              1
 
 #define PRESSURE_MSG            "PRESSURE (KPA):_P_\nTEMP:_T_ DHT:_DT__SPH_HUM:_DH_% ND:_D_\nCP:_X_,_Y_,_Z_"
-#define DHT_CALMSG              "DHT11/22 CALIBRATION\nREAD PERIOD(MSEC):\nTEMP:_NB1_ HUM:_NB2_."
+#define DHT_CALMSG              "DHTXX CALIB.\nREAD PER.(MSEC):\nTEMP:_NB1_ HUM:_NB2_."
 
 
 #ifdef USING_OLED_SSD1306
@@ -45,9 +46,11 @@ to save space in memory of MCU .
 #define OE_LEVEL_CONVERTER_PIN  4
 #endif
 
-#define CONV_INCHHG_PASCAL      3386.389000000074
-#define CONV_PASCAL_INCHHG      0.00029529983071445
-#define CONV_INCH_MM            25.400002697664
+#define CONV_INCHHG_PASCAL            3386.389000000074
+#define CONV_PASCAL_INCHHG            0.00029529983071445
+#define CONV_INCH_MM                  25.400002697664
+//#define CONV_FACTOR_ELEVATION         3.28084
+//#define CONV_PRESSION_ELEVATION_BASE  1019.66
 
 #include <SPI.h>
 #include <Adafruit_GFX.h>
@@ -99,7 +102,8 @@ void setup()
   //StrUUID=String( (uint32_t)&GUID0 ) +String("-")+ String( (uint32_t)&GUID1 )+String("-")+ String( (uint32_t)&GUID2 ); 
   
   Serial.begin(9600);
-  delay(500);
+  delay(WAIT_LONG_DELAY);
+
 #ifdef SERIAL_MSG
   Serial.println(F("BOOT"));
 #endif  
@@ -134,7 +138,9 @@ void setup()
 #ifdef USING_OLED_SSD1306
   if( ! display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) 
   {
+#ifdef SERIAL_MSG
     Serial.println(F("SSD1306 allocation failed"));
+#endif
     for(;;); // Don't proceed, loop forever
   }
 #endif
@@ -148,7 +154,7 @@ void setup()
 #endif
   
   //display.display() ;
-  delay(2000);
+  delay(WAIT_LONG_DELAY);
   //display.display(); 
 
 #ifdef USING_OLED_SSD1306
@@ -342,7 +348,7 @@ void loop()
                             Adafruit_BMP280::SAMPLING_X8,
                             Adafruit_BMP280::FILTER_X2,
                             Adafruit_BMP280::STANDBY_MS_2000);
-      delay(2500) ; 
+      delay(WAIT_LONG_DELAY) ; 
     
     }
   
@@ -370,6 +376,7 @@ void loop()
   StrMsg.replace(String("_D_"), String( mDirection, ASTROLAB_DECIMAL ) ) ; 
   StrMsg.replace(String("_DH_"), String( dhHum, ASTROLAB_HUM_DECIMAL ) ) ; 
   StrMsg.replace(String("_DT_"), String( dhTemp, ASTROLAB_DECIMAL  ) ) ; 
+  //StrMsg.replace(String("_A_"),  String( BoschBMP.readAltitude(CONV_PRESSION_ELEVATION_BASE)*CONV_FACTOR_ELEVATION , ASTROLAB_DECIMAL ) ) ; 
 
 #ifdef USING_OLED_SSD1306  
   display.setCursor(0, 0);
@@ -387,7 +394,7 @@ void loop()
 #ifdef SERIAL_MSG
   Serial.println(F("DONE"));
 #endif 
-  delay(500);
+  delay(WAIT_LONG_DELAY);
 
 #ifdef USING_OLED_SSD1306
   display.clearDisplay();    
