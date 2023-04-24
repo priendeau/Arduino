@@ -70,6 +70,10 @@ Following define macro are managing behaviour of the application
 #if defined(__LGT8FX8P__)
 #define ANALOG_SAMPLING         12
 #endif
+/* In the case your Uno / Nano claim to be not declared about ANALOG_SAMPLING you get 10 by default.*/
+#ifndef ANALOG_SAMPLING
+#define ANALOG_SAMPLING         10 
+#endif 
 
 
 #ifdef USING_SSD1306_U8GLIB
