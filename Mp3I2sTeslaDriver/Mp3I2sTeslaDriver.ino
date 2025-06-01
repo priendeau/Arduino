@@ -82,15 +82,6 @@
 #include <WiFiMulti.h>
 #include "secrets.h"  // add WLAN Credentials in here.
 
-//#include <esp32-hal-uart.h>
-//#include "/media/maxiste/UBEXTFS240GB-001/Arduino-2.2.1/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.1-33fbade6/esp32/include/driver/uart/include/driver/uart.h"
-
-/* Not working include 
-  #include <tools/esp32-arduino-libs/idf-release_v5.1-33fbade6/esp32/include/driver/uart/include/driver/uart.h>
-	#include "../../../../../tools/esp32-arduino-libs/idf-release_v5.1-33fbade6/esp32/include/driver/uart/include/driver/uart.h"
-	#include "/media/maxiste/UBEXTFS240GB-001/Arduino-2.2.1/.arduino15/packages/esp32/hardware/esp32/3.0.5/cores/esp32/esp32-hal-uart.h"
-*/
-
 #if MASTER_BACKEND_VALUE == 1 
 #include "Audio.h"
 #endif 
@@ -126,16 +117,13 @@ Audio audio;
 
 WiFiMulti wifiMulti;
 
-//String ssid 				= "Riendeau" ;
-//String password 		= "Chloe123!";
-
 String StrReadTerm ; 
 String StrCmdRecv  ; 
 
-bool bStateMsgNBE 			= false ;  
+bool bStateMsgNBE 	= false ;  
 bool bStateMsgNoSongAct = false ;  
-bool bSetDnsResult 			= false ;
-bool bStateEndCmdIn			= false ; 
+bool bSetDnsResult 	= false ;
+bool bStateEndCmdIn	= false ; 
 
 const int uart_buffer_size = (1024 * 2);
 
