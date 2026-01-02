@@ -91,7 +91,7 @@
 /* Uncomment HAVE_INTERNAL_HARD_SET to let arduino ide 
 compile it online 
 */ 
-//#define	HAVE_INTERNAL_HARD_SET		1
+#define	HAVE_INTERNAL_HARD_SET		1
 
 #ifdef HAVE_INTERNAL_HARD_SET
 #define HARD_HOUR_VAL					10
@@ -123,7 +123,7 @@ compile it online
 /* Uncomment HAVE_INTERNAL_MATRIX_COUNT to let arduino ide 
 compile it online 
 */ 
-//#define	HAVE_INTERNAL_MATRIX_COUNT		1
+#define	HAVE_INTERNAL_MATRIX_COUNT		1
 
 #ifdef HAVE_INTERNAL_MATRIX_COUNT
 #define INTERNAL_MATRIX_COUNT					4
