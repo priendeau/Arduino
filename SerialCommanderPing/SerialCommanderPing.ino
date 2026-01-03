@@ -19,10 +19,10 @@ extern "C"
 
 */
 #define MAJOR_VERSION   1
-#define MINOR_VERSION   2423547
+#define MINOR_VERSION   2423548
 
 
-#define MAX_HOST_ADD  256
+#define MAX_HOST_ADD  64
 
 #if !defined( TERMINAL_BAUD )
 #define TERMINAL_BAUD_SPEED     115200
@@ -35,6 +35,12 @@ extern "C"
    debug from this function.
 */
 
+/* reffered to lwip/opt.h some DEBUG option to 
+   icmp interface.
+*/
+#define   ICMP_DEBUG                  1/* Enable debugging in icmp.c. */
+#define   SOCKETS_DEBUG               1/* Enable debugging in sockets.c */
+//#define DEBUG_DEL_IP                1
 //#define DEBUG_COMMAND_EVALUATION    1
 //#define DEBUG_SERIAL_EVENT          1
 //#define DEBUG_ADD_IP                1
@@ -101,13 +107,15 @@ typedef enum enum_ExprCmd
 	CMD_WIFI_SSID       = 6,
   CMD_WIFI_PASS       = 7,
   CMD_WIFI_CONNECT    = 8,
-	CMD_PING            = 9,
-  CMD_TEST            = 10,
-  CMD_REBOOT          = 11,
-  CMD_REBOOT_UPGRADE  = 12,
-  CMD_IP_INFO         = 13,
-  CMD_UNKNOW          = 14,
-	CMD_END			        = 15
+  CMD_WIFI_SCAN       = 9,
+  CMD_WIFI_CLOSE      = 10,
+	CMD_PING            = 11,
+  CMD_TEST            = 12,
+  CMD_REBOOT          = 13,
+  CMD_REBOOT_UPGRADE  = 14,
+  CMD_IP_INFO         = 15,
+  CMD_UNKNOW          = 16,
+	CMD_END			        = 17
 } ExprCmd ;
 
 /*
@@ -189,7 +197,7 @@ uint iTableIndex = 0 ;
   back to CMD_NEW.
 */
 
-stCmd_t TableCommand[14] = { {CMD_HELP           , "help"        } , 
+stCmd_t TableCommand[16] = { {CMD_HELP           , "help"        } , 
 		                         {CMD_ABOUT          , "about"       } , 
 		                         {CMD_LIST_HOST      , "list host"   } , 
 		                         {CMD_ADD_HOST       , "add host"    } , 
@@ -197,6 +205,8 @@ stCmd_t TableCommand[14] = { {CMD_HELP           , "help"        } ,
 		                         {CMD_WIFI_SSID      , "wifi ssid"   } , 
 		                         {CMD_WIFI_PASS      , "wifi pass"   } , 
 		                         {CMD_WIFI_CONNECT   , "wifi connect"} ,
+                             {CMD_WIFI_SCAN      , "wifi scan"   } ,
+                             {CMD_WIFI_CLOSE     , "wifi close"  } ,
                              {CMD_IP_INFO        , "ip info"     } , 
 		                         {CMD_PING           , "ping"        } , 
                              {CMD_TEST           , "test"        } ,
@@ -394,48 +404,63 @@ void AddIp()
 void DelIp()
 {
   /* How DelIp work.
-  It should extract the IP list from the TableHostIP and associate it to a new point. 
-  While looping in the list, the selected one will not be inserted inside the other
-  new pointer list and at the end it assign the new pointer to TableHostIP suppressing
-  the one selected for deletion. Also it's required to reduce the index iTableIndex by
-  one. The way it work, TableHostIP have no problem to receive a pointer-list from 
-  somewhere (this function), and will keep it because TableHostIP is external. Like 
-  AddIp does add one by one to the TableHostIP, DelIp is similar but does not link
-  the discarded one, which is equivalent to lose it instead putting '0' into subNet_A,
-  subNet_B,subNet_C,subNet_D.
+  It should extract the IP list from the TableHostIP and associate to the same pointer-id
+  until the one required to delete inside StrCmdRecv.toInt as index will be compared with
+  a for() where once you reach at this level it's skip and next item inside for will be 
+  associated to same-pointer id of the discarded one and next one will be assigned to 
+  next after StrCmdRecv.toInt. At the end we decrease the General pointer iTableIndex by one.
   */
   
   stIp_Addr_t *NewTableHostIP = NULL ;
+#if defined(DEBUG_DEL_IP)  
+  stIp_Addr_t *IpAdd, *IpAddrShow ; 
+#else
   stIp_Addr_t *IpAdd ; 
+#endif
   int iRankToRemove = StrCmdRecv.toInt() ; 
-  /*Create the other buffer for the new list of stIp_Addr_t.*/
-  NewTableHostIP = (stIp_Addr_t*)( malloc( sizeof( stIp_Addr_t ) * MAX_HOST_ADD  ) ) ;
-
+#if defined(DEBUG_DEL_IP)  
+  IpAddrShow = (stIp_Addr_t*)( malloc( sizeof( stIp_Addr_t ) ) ) ;
+  *IpAddrShow = *(TableHostIP + iRankToRemove ) ;
+  String StrAddr = String(IpAddrShow->subNet_A) + "." + String(IpAddrShow->subNet_B) + "." + String(IpAddrShow->subNet_C) + "." + String( IpAddrShow->subNet_D ) ;
+  Serial.printf("\r\nAddress to remove: id: %i IP:%s\r\n", iRankToRemove,StrAddr) ; 
+#endif
+  int iIndexSkip=0 ; 
   for( int iTableList=0 ; iTableList <= iTableIndex-1; iTableList++)
   {
     IpAdd = (stIp_Addr_t*)( malloc( sizeof( stIp_Addr_t ) ) ) ;
     *IpAdd = *(TableHostIP + iTableList ) ;
-    
-    //StrMsgRet=StrMsgRet + String(iTableList) + " -> IP: " + String( IpAdd->subNet_A ) + "." + String( IpAdd->subNet_B) + "." + String( IpAdd->subNet_C ) + "." + String( IpAdd->subNet_D ) + "\r\n" ; 
-    //IpAdd->subNet_A, IpAdd->subNet_B, IpAdd->subNet_C, IpAdd->subNet_D    
-    if( iTableList != iRankToRemove)
+   
+    if( iTableList < iRankToRemove)
     {
-       *(NewTableHostIP + iTableList ) = *IpAdd ; 
+      iIndexSkip=iTableList ;
     }
-    free(IpAdd) ; 
+
+    if( iTableList >= iRankToRemove)
+    {
+      /* This should overwrite the pointer-location equal to
+      *(TableHostIP + iRankToRemove ) by passing over iRankToRemove
+      with iTableList-1 when iTableList is over iRankToRemove
+      so pointer after *(TableHostIP + iRankToRemove ) are 
+      *(TableHostIP + iRankToRemove+1 ) and us case mean iTableList-1
+      which suppose to be iTableList > iRankToRemove.
+      */
+      iIndexSkip=iTableList-1 ;
+    }
+    
+    if( iTableList != iRankToRemove )
+    {
+      *(TableHostIP + iIndexSkip ) = *IpAdd ;
+    }
+#if defined(DEBUG_DEL_IP)  
+    else
+    {
+      StrAddr = String(IpAdd->subNet_A) + "." + String(IpAdd->subNet_B) + "." + String(IpAdd->subNet_C) + "." + String( IpAdd->subNet_D ) ;
+      Serial.printf("\r\nAddress to be discarded : id: %i IP:%s\r\n", iTableList,StrAddr) ; 
+    }
+#endif
   }    
-  /* This free whenever it call it also free a Global
-  variabl.Your actual pointer-record disapear.
-  After it this internal assignation from NewTableHostIP
-  hosting the transfert structure_type into a with a 
-  new reference to TableHostIP. 
-  */
-  free(TableHostIP) ;
-  TableHostIP = NewTableHostIP ; 
-  /*Decreasing the Global index, iTableIndex by one since 
-   we removing only one element at the time.*/
+
   iTableIndex=iTableIndex-1;
-  //free( NewTableHostIP ) ; 
 }
 
 //String helper_menu( char *chStreamCmd )
@@ -455,7 +480,7 @@ void helper_menu( st_HelperInfo &stHelperOut )
       stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
       //stHelperOut.CmdType   = CMD_HELP;
 			//isCmdFound=true ; 
-      StrMsgRet="Help Menu for the application SerialCommanderPing.\r\nInitially the application is accessible through the serial\r\nline and does nothing until you specifiy the wifi ssid/password\r\n and add host to ping. Once configured you type ping \r\ncommand to process. There is no saving to restore it later.\r\n\r\n\tList of available command.\r\n\r\nhelp            This help\r\nabout           About this application\r\nlist host       List host added to the Ping\r\nadd host        Add an host to ping-it\r\ndel host        Delete an host from the Ping list\r\nwifi ssid       Set the wifi SSID name to connect to.\r\nwifi pass       Set the wifi password to obtain your IP.\r\nwifi connect    once SSID/PASS defined it's authentificate\r\n                and obtain your ip.\r\nip info         Obtain IP information once connected.\r\nping            Processing all the host to PING.\r\ntest            Launch a generic example including\r\n                ping a fake host.\r\nreboot          Reboot the micro-controller.\r\nreboot upgrade  Reboot into download mode.\r\n\r\n";
+      StrMsgRet="Help Menu for the application SerialCommanderPing.\r\nInitially the application is accessible through the serial\r\nline and does nothing until you specifiy the wifi ssid/password\r\n and add host to ping. Once configured you type ping \r\ncommand to process. There is no saving to restore it later.\r\n\r\n\tList of available command.\r\n\r\nhelp            This help\r\nabout           About this application\r\nlist host       List host added to the Ping\r\nadd host        Add an host to ping-it\r\ndel host        Delete an host from the Ping list\r\nwifi ssid       Set the wifi SSID name to connect to.\r\nwifi pass       Set the wifi password to obtain your IP.\r\nwifi scan       Use Wifi scan to select ssid.\r\nwifi close      close a connected network/ssid session.\r\nwifi connect    once SSID/PASS defined it's authentificate\r\n                and obtain your ip.\r\nip info         Obtain IP information once connected.\r\nping            Processing all the host to PING.\r\ntest            Launch a generic example including\r\n                fake host ping.\r\nreboot          Reboot the micro-controller.\r\nreboot upgrade  Reboot into download mode.\r\n\r\n";
     break;
 
 		case CMD_ABOUT :
@@ -490,7 +515,20 @@ void helper_menu( st_HelperInfo &stHelperOut )
       StrMsgRet=StrMsgRet + "\r\n\r\nHost number to delete:" ;
 		break;
 		
-		case CMD_WIFI_CONNECT :
+    case CMD_WIFI_CLOSE :
+      stHelperOut.CmdStatus = CMD_NOTHING_REQ;
+      if( !stationConnected )
+      {
+        stHelperOut.CmdStatus = CMD_INCOMPLETE_DATA ; 
+        StrMsgRet="\r\nCan't close WIFI session, it's not yet connected.\r\nTry to connect first.\r\n";
+      }
+      else
+      {
+        StrMsgRet="\r\nClosing WIFI session :" + StrSSID +"\r\n";
+      }
+    break ;
+		
+    case CMD_WIFI_CONNECT :
       stHelperOut.CmdStatus = CMD_NOTHING_REQ;
       //stHelperOut.CmdType   = CMD_WIFI_CONNECT;
       if ( StrSSID == "" ) 
@@ -511,7 +549,36 @@ void helper_menu( st_HelperInfo &stHelperOut )
         
       }        
     break;
-
+    case CMD_WIFI_SCAN :
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      if( stHelperOut.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        StrMsgRet="\r\nScan and report available ssid for network authentification.\r\n";
+        int nNets = WiFi.scanNetworks();
+        int iDelayCalc = 0 ;
+        int iDelayScan = 10 ;
+        while ( WiFi.scanComplete() <= 0 ) 
+        {
+          delay(iDelayScan) ;
+          iDelayCalc+=iDelayScan ;  
+        }
+        StrMsgRet=StrMsgRet + "\r\nScan done in " + String(iDelayCalc) + " msecs.\r\n" ; 
+        if( nNets == 0) 
+        {
+          stHelperOut.CmdStatus = CMD_TERMINATED ; 
+          StrMsgRet=StrMsgRet + "\r\nWifi report 0 visible network.\r\nMove your micro-controller out of\r\nnoise and far from other client and try again\r\n"  ;
+        }
+        else
+        {
+          StrMsgRet=StrMsgRet + "\r\nSelect a Wifi in the scan list (up to "+String(nNets-1)+" choice(s)).\r\n" ;
+          for (int i = 0; i < nNets; i++)
+          {
+            StrMsgRet=StrMsgRet + String(i) + " : ssid: " + String( WiFi.SSID(i) ) + "\r\n" ;
+          }
+          StrMsgRet=StrMsgRet + "\r\nYour choice:" ;
+        }
+      }
+    break ;
 		case CMD_WIFI_SSID :
       stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
       //stHelperOut.CmdType = CMD_WIFI_SSID;
@@ -659,6 +726,16 @@ void MenuAction( st_HelperInfo &stMainInfo )
       }
       stMainInfo.CmdStatus = CMD_TERMINATED ; 
     break ;
+
+    case CMD_WIFI_CLOSE :
+      if( stMainInfo.CmdStatus == CMD_NOTHING_REQ )
+      {
+        WiFi.disconnect() ;
+        stationConnected=false;
+      }
+
+    break;
+    
     case CMD_WIFI_CONNECT :
       if( stMainInfo.CmdStatus == CMD_NOTHING_REQ )
       {
@@ -684,6 +761,15 @@ void MenuAction( st_HelperInfo &stMainInfo )
         Serial.printf( "MAC Address : %s\r\n", String( WiFi.macAddress() ).c_str() ) ;
       }
       stMainInfo.CmdStatus = CMD_TERMINATED ;
+    break ;
+    case CMD_WIFI_SCAN :
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        Serial.printf("\r\nUsing SSID:(%s)\r\nThis will feed information for command 'wifi ssid', don't forget your password.\r\n", WiFi.SSID( StrCmdRecv.toInt() ) );
+        StrSSID = WiFi.SSID( StrCmdRecv.toInt() ) ;
+        WiFi.scanDelete(); 
+        delay(1000);
+      }
     break ;
     case CMD_IP_INFO :
       if( stMainInfo.CmdStatus == CMD_NOTHING_REQ )
