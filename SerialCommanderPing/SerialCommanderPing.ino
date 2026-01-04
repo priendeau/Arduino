@@ -1,6 +1,11 @@
 #include <cstdlib>
 #include <cstring>
 
+/*
+#include <iostream>
+#include <string>
+  Arduino C++ own his proper strtol function instead of std::stoul(std::cstring, nullptr, uint ); 
+*/
 #include <Pinger.h>
 #include <ESP8266WiFi.h>
 #include <Arduino.h>
@@ -19,10 +24,10 @@ extern "C"
 
 */
 #define MAJOR_VERSION   1
-#define MINOR_VERSION   2423548
+#define MINOR_VERSION   2423550
 
 
-#define MAX_HOST_ADD  64
+#define MAX_HOST_ADD  512
 
 #if !defined( TERMINAL_BAUD )
 #define TERMINAL_BAUD_SPEED     115200
@@ -40,6 +45,7 @@ extern "C"
 */
 #define   ICMP_DEBUG                  1/* Enable debugging in icmp.c. */
 #define   SOCKETS_DEBUG               1/* Enable debugging in sockets.c */
+//#define DEBUG_SET_MAC               1
 //#define DEBUG_DEL_IP                1
 //#define DEBUG_COMMAND_EVALUATION    1
 //#define DEBUG_SERIAL_EVENT          1
@@ -91,6 +97,7 @@ String StrCmdRecv = "" ;
 String StrSSID = ""; 
 String StrPass = "";
 
+uint WifiMode ; 
 bool bStateEndCmdIn			 = false ; 
 bool stationConnected    = false ;
 
@@ -101,21 +108,23 @@ typedef enum enum_ExprCmd
   CMD_NONE            = 0,
 	CMD_HELP            = 1,
 	CMD_ABOUT           = 2,
-	CMD_LIST_HOST       = 3,
-	CMD_ADD_HOST        = 4,
-	CMD_DEL_HOST        = 5,
-	CMD_WIFI_SSID       = 6,
-  CMD_WIFI_PASS       = 7,
-  CMD_WIFI_CONNECT    = 8,
-  CMD_WIFI_SCAN       = 9,
-  CMD_WIFI_CLOSE      = 10,
-	CMD_PING            = 11,
-  CMD_TEST            = 12,
-  CMD_REBOOT          = 13,
-  CMD_REBOOT_UPGRADE  = 14,
-  CMD_IP_INFO         = 15,
-  CMD_UNKNOW          = 16,
-	CMD_END			        = 17
+  CMD_VERSION         = 3,
+	CMD_LIST_HOST       = 4,
+	CMD_ADD_HOST        = 5,
+	CMD_DEL_HOST        = 6,
+	CMD_WIFI_SSID       = 7,
+  CMD_WIFI_PASS       = 8,
+  CMD_WIFI_CONNECT    = 9,
+  CMD_WIFI_SCAN       = 10,
+  CMD_WIFI_SET_MAC    = 11,
+  CMD_WIFI_CLOSE      = 12,
+	CMD_PING            = 13,
+  CMD_TEST            = 14,
+  CMD_REBOOT          = 15,
+  CMD_REBOOT_UPGRADE  = 16,
+  CMD_IP_INFO         = 17,
+  CMD_UNKNOW          = 18,
+	CMD_END			        = 19
 } ExprCmd ;
 
 /*
@@ -185,6 +194,7 @@ typedef struct st_IpSubLvl
   uint  subNet_D ; 
 } stIp_Addr_t ;
 
+uint8_t newMACAddress[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 stIp_Addr_t *TableHostIP = NULL ; 
 uint iTableIndex = 0 ;
 
@@ -197,8 +207,9 @@ uint iTableIndex = 0 ;
   back to CMD_NEW.
 */
 
-stCmd_t TableCommand[16] = { {CMD_HELP           , "help"        } , 
-		                         {CMD_ABOUT          , "about"       } , 
+stCmd_t TableCommand[18] = { {CMD_HELP           , "help"        } , 
+		                         {CMD_ABOUT          , "about"       } ,
+                             {CMD_VERSION        , "version"     } , 
 		                         {CMD_LIST_HOST      , "list host"   } , 
 		                         {CMD_ADD_HOST       , "add host"    } , 
 		                         {CMD_DEL_HOST       , "del host"    } , 
@@ -206,6 +217,7 @@ stCmd_t TableCommand[16] = { {CMD_HELP           , "help"        } ,
 		                         {CMD_WIFI_PASS      , "wifi pass"   } , 
 		                         {CMD_WIFI_CONNECT   , "wifi connect"} ,
                              {CMD_WIFI_SCAN      , "wifi scan"   } ,
+                             {CMD_WIFI_SET_MAC   , "wifi mac"    } ,
                              {CMD_WIFI_CLOSE     , "wifi close"  } ,
                              {CMD_IP_INFO        , "ip info"     } , 
 		                         {CMD_PING           , "ping"        } , 
@@ -401,6 +413,52 @@ void AddIp()
   free(IpAdd) ;
 }
 
+void ChangeMacId() 
+{
+  String StrToNum ; 
+  StrToNum.reserve(2) ;
+  char cInspect ;
+  int iPos =0 ;
+  unsigned long hexValue ; 
+  StrCmdRecv.trim() ;
+  StrCmdRecv.toUpperCase();
+#if defined(DEBUG_SET_MAC)  
+  Serial.printf("\r\nInspecting entry: String:(%s) length:(%i)\r\n", StrCmdRecv.c_str(), StrCmdRecv.length()) ;
+#endif  
+  for( int iLen=0 ; iLen <= StrCmdRecv.length() ; iLen++ )
+  {
+    cInspect=(char)( StrCmdRecv[iLen] ) ;
+    if( ( (int)(cInspect) != 58 ) && ( (int)(cInspect) != 0 )  )
+    {
+      StrToNum+=StrCmdRecv[iLen] ;
+    }
+    else
+    {
+#if defined(DEBUG_SET_MAC)
+      Serial.printf("\r\nPart digit to convert: %s\r\n", StrToNum.c_str() ) ;
+#endif
+      if( iPos <= 6 )
+      { 
+        //std::string cStrConv = StrToNum.c_str(); 
+        hexValue = strtol( StrToNum.c_str(), nullptr, 16 );
+        newMACAddress[iPos]=hexValue ; 
+#if defined(DEBUG_SET_MAC)
+        Serial.printf("\r\nConverting String to Number:id[%i]: Value:[%s], hexadecimal value:[%lu]\r\n", iPos, StrToNum, hexValue ) ;
+#endif
+        iPos+=1; 
+        StrToNum="" ;     
+      }
+    }
+  }
+  Serial.printf("\r\nUpdating MAC Address to: %X:%X:%X:%X:%X:%X\r\n", newMACAddress[0],
+                                                                      newMACAddress[1],
+                                                                      newMACAddress[2],
+                                                                      newMACAddress[3],
+                                                                      newMACAddress[4],
+                                                                      newMACAddress[5] ) ;
+  wifi_set_macaddr(STATION_IF, &newMACAddress[0]);
+}
+
 void DelIp()
 {
   /* How DelIp work.
@@ -462,6 +520,88 @@ void DelIp()
 
   iTableIndex=iTableIndex-1;
 }
+void WifiScan( st_HelperInfo &stHelperOut, String &StrMsgRet )
+{
+  int nNets = WiFi.scanNetworks();
+  int iDelayCalc = 0 ;
+  int iDelayScan = 5 ;
+  while ( WiFi.scanComplete() <= 0 ) 
+  {
+    delay(iDelayScan) ;
+    iDelayCalc+=iDelayScan ;  
+  }
+  StrMsgRet=StrMsgRet + "\r\nScan done in " + String(iDelayCalc) + " msecs.\r\n" ; 
+  if( nNets == 0) 
+  {
+    stHelperOut.CmdStatus = CMD_TERMINATED ; 
+    StrMsgRet=StrMsgRet + "\r\nWifi report 0 visible network.\r\nMove your micro-controller out of\r\nnoise and far from other client and try again\r\n"  ;
+  }
+  else
+  {
+    StrMsgRet=StrMsgRet + "\r\nSelect a Wifi in the scan list (up to "+String(nNets-1)+" choice(s)).\r\n" ;
+    StrMsgRet=StrMsgRet + "0 : ssid: None / Invisible.\r\n" ;
+    for (int i = 1; i < nNets+1; i++)
+    {
+      StrMsgRet=StrMsgRet + String(i) + " : ssid: " + String( WiFi.SSID(i-1) ) + "\r\n" ;
+    }
+    StrMsgRet=StrMsgRet + "\r\nYour choice:" ;
+  }
+
+}
+
+void WifiConnect()
+{
+  bool isOutLoopWifi = false ; 
+  Serial.printf("\r\nTrying to connect network name: %s.\r\n ", StrSSID );
+  stationConnected= WiFi.begin(StrSSID,StrPass);
+  String StrWifiType="" ;
+  // Wait connection completed
+  switch( WifiMode)
+  {
+    case WIFI_AP:
+      StrWifiType="ACCESSPOINT" ;
+    break;
+    case WIFI_STA:
+      StrWifiType="STATION" ;
+    break ;
+    case WIFI_AP_STA :
+      StrWifiType="ACCESSPOINT_STATION" ;
+    break ;
+  }
+  Serial.printf("\n\nConnecting as %s to %s...", StrWifiType, StrSSID );
+  
+  while( isOutLoopWifi != true )
+  {
+    delay(500);
+    Serial.print(".");
+    if( WiFi.status() == WL_CONNECTED ) 
+    {
+      isOutLoopWifi = true;
+    }
+    if( WiFi.status() == WL_WRONG_PASSWORD )
+    {
+      isOutLoopWifi = true;
+    }
+  }
+  if( isOutLoopWifi && WiFi.status() == WL_CONNECTED )
+  {
+    Serial.print("Ok\r\n");
+    Serial.printf( "IP address information:[ %s ]\r\n", WiFi.localIP().toString().c_str() );
+    Serial.printf( "IP Gateway information: %s\r\n", WiFi.gatewayIP().toString().c_str());
+    Serial.printf( "MAC Address : %s\r\n", String( WiFi.macAddress() ).c_str() ) ;
+  }
+  if( isOutLoopWifi && WiFi.status() == WL_WRONG_PASSWORD )
+  {
+    Serial.print("Warning !!! Wrong Password.\r\n");
+    Serial.printf("\r\nStart over with 'wifi pass' and put the good password for ssid: %s.\r\n",StrSSID);
+    stationConnected=false;
+  }
+  // Check if connection errors
+  if(!stationConnected)
+  {
+    Serial.println("Error, unable to connect specified WiFi network.");
+  }
+}
 
 //String helper_menu( char *chStreamCmd )
 //void helper_menu( st_HelperInfo &stHelperOut, String StrStreamCmd )
@@ -480,8 +620,8 @@ void helper_menu( st_HelperInfo &stHelperOut )
       stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
       //stHelperOut.CmdType   = CMD_HELP;
 			//isCmdFound=true ; 
-      StrMsgRet="Help Menu for the application SerialCommanderPing.\r\nInitially the application is accessible through the serial\r\nline and does nothing until you specifiy the wifi ssid/password\r\n and add host to ping. Once configured you type ping \r\ncommand to process. There is no saving to restore it later.\r\n\r\n\tList of available command.\r\n\r\nhelp            This help\r\nabout           About this application\r\nlist host       List host added to the Ping\r\nadd host        Add an host to ping-it\r\ndel host        Delete an host from the Ping list\r\nwifi ssid       Set the wifi SSID name to connect to.\r\nwifi pass       Set the wifi password to obtain your IP.\r\nwifi scan       Use Wifi scan to select ssid.\r\nwifi close      close a connected network/ssid session.\r\nwifi connect    once SSID/PASS defined it's authentificate\r\n                and obtain your ip.\r\nip info         Obtain IP information once connected.\r\nping            Processing all the host to PING.\r\ntest            Launch a generic example including\r\n                fake host ping.\r\nreboot          Reboot the micro-controller.\r\nreboot upgrade  Reboot into download mode.\r\n\r\n";
-    break;
+      StrMsgRet="Help Menu for the application SerialCommanderPing.\r\nInitially the application is accessible through the serial\r\nline and does nothing until you specifiy the wifi ssid/password\r\n and add host to ping. Once configured you type ping \r\ncommand to process. There is no saving to restore it later.\r\n\r\n\tList of available command.\r\n\r\nhelp            This help\r\nabout           About this application\r\nversion         Print version of the application.\r\nlist host       List host added to the Ping\r\nadd host        Add an host to ping-it\r\ndel host        Delete an host from the Ping list\r\nwifi ssid       Set the wifi SSID name to connect to.\r\nwifi pass       Set the wifi password to obtain your IP.\r\nwifi scan       Use Wifi scan to select ssid.\r\nwifi mac        Change your MAC Address, offline.\r\nwifi close      close a connected network/ssid session.\r\nwifi connect    once SSID/PASS defined it's authentificate\r\n                and obtain your ip.\r\nip info         Obtain IP information once connected.\r\nping            Processing all the host to PING.\r\ntest            Launch a generic example including\r\n                fake host ping.\r\nreboot          Reboot the micro-controller.\r\nreboot upgrade  Reboot into download mode.\r\n\r\n";
+   break;
 
 		case CMD_ABOUT :
       stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
@@ -489,6 +629,11 @@ void helper_menu( st_HelperInfo &stHelperOut )
 			//isCmdFound=true ; 
 			StrMsgRet="You reach the about.\r\n\r\nThis is an Arduino project compiled with.\r\nArduinoIDE 2.2.1-x86_64  or  arduino-cli\r\nVersion: 1.1.1  Commit: fa6eafcb.  Use\r\nmostly esp32 library version  3.0.5.  For\r\nesp8266  the final  sdk 3.1.2,  and \r\nESP8266-ping version 2.0.1,  ESP8266WiFi \r\ncome from sdk. Adapted  for  esp8266, \r\nnode_mcu or esp32 wroom  32Mbit. It's \r\nan internet PING application to  program \r\na list of  host to ping and  show  relative \r\ninformation to ping. Consult  the  help\r\n to get more command. \r\n\r\n";
 		break;
+
+    case CMD_VERSION :
+      stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
+      StrMsgRet="SerialCommanderPing Version " + String(MAJOR_VERSION) +"."+ String(MINOR_VERSION)+ "\r\n";
+    break;
 
 		case CMD_LIST_HOST :
       stHelperOut.CmdStatus = CMD_TERMINATED;
@@ -553,32 +698,23 @@ void helper_menu( st_HelperInfo &stHelperOut )
       stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
       if( stHelperOut.CmdStatus == CMD_REQUIRE_DATA )
       {
-        StrMsgRet="\r\nScan and report available ssid for network authentification.\r\n";
-        int nNets = WiFi.scanNetworks();
-        int iDelayCalc = 0 ;
-        int iDelayScan = 10 ;
-        while ( WiFi.scanComplete() <= 0 ) 
-        {
-          delay(iDelayScan) ;
-          iDelayCalc+=iDelayScan ;  
-        }
-        StrMsgRet=StrMsgRet + "\r\nScan done in " + String(iDelayCalc) + " msecs.\r\n" ; 
-        if( nNets == 0) 
-        {
-          stHelperOut.CmdStatus = CMD_TERMINATED ; 
-          StrMsgRet=StrMsgRet + "\r\nWifi report 0 visible network.\r\nMove your micro-controller out of\r\nnoise and far from other client and try again\r\n"  ;
-        }
-        else
-        {
-          StrMsgRet=StrMsgRet + "\r\nSelect a Wifi in the scan list (up to "+String(nNets-1)+" choice(s)).\r\n" ;
-          for (int i = 0; i < nNets; i++)
-          {
-            StrMsgRet=StrMsgRet + String(i) + " : ssid: " + String( WiFi.SSID(i) ) + "\r\n" ;
-          }
-          StrMsgRet=StrMsgRet + "\r\nYour choice:" ;
-        }
+        StrMsgRet="\r\nScan and report available ssid for network authentification.\r\n"; 
+        WifiScan( stHelperOut , StrMsgRet );
       }
     break ;
+    case CMD_WIFI_SET_MAC :
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      if( !stationConnected )
+      {
+        StrMsgRet="\r\nChange MAC Adresse of wifi session.\r\nActual MAC Adress: ("+String(WiFi.macAddress())+")\r\nNew MAC address:";
+      }
+      else
+      {
+        stHelperOut.CmdStatus = CMD_INCOMPLETE_DATA ;
+        StrMsgRet="\r\nChanging MAC Adress require to be change offline, disconnect to wifi first.\r\n" ;
+      }
+      
+    break;
 		case CMD_WIFI_SSID :
       stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
       //stHelperOut.CmdType = CMD_WIFI_SSID;
@@ -733,44 +869,46 @@ void MenuAction( st_HelperInfo &stMainInfo )
         WiFi.disconnect() ;
         stationConnected=false;
       }
-
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
     break;
     
     case CMD_WIFI_CONNECT :
       if( stMainInfo.CmdStatus == CMD_NOTHING_REQ )
       {
-        Serial.printf("\r\nTrying to connect network name: %s.\r\n ", StrSSID );
-        stationConnected= WiFi.begin(StrSSID,StrPass);
-
-        // Check if connection errors
-        if(!stationConnected)
-        {
-          Serial.println("Error, unable to connect specified WiFi network.");
-        }
-        
-        // Wait connection completed
-        Serial.print("\n\nConnecting to AP...");
-        while(WiFi.status() != WL_CONNECTED)
-        {
-          delay(500);
-          Serial.print(".");
-        }
-        Serial.print("Ok\r\n");
-        Serial.printf( "IP address information:[ %s ]\r\n", WiFi.localIP().toString().c_str() );
-        Serial.printf( "IP Gateway information: %s\r\n", WiFi.gatewayIP().toString().c_str());
-        Serial.printf( "MAC Address : %s\r\n", String( WiFi.macAddress() ).c_str() ) ;
+        WifiConnect() ;
       }
       stMainInfo.CmdStatus = CMD_TERMINATED ;
     break ;
     case CMD_WIFI_SCAN :
+      if( stMainInfo.CmdStatus == CMD_TERMINATED )
+      {
+        Serial.println("WiFi Scanner show no network in range or your antenna is weak or made from poor quality.") ;
+      }
       if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
       {
-        Serial.printf("\r\nUsing SSID:(%s)\r\nThis will feed information for command 'wifi ssid', don't forget your password.\r\n", WiFi.SSID( StrCmdRecv.toInt() ) );
-        StrSSID = WiFi.SSID( StrCmdRecv.toInt() ) ;
-        WiFi.scanDelete(); 
-        delay(1000);
+        if( StrCmdRecv.toInt() == 0 )
+        {
+          Serial.println("Selecting 0, as network/ssid mean you were unable to see the network during a scan.\r\nPlease use 'wifi ssid' to enter it manually.\r\n") ;
+          stMainInfo.CmdStatus == CMD_TERMINATED ;
+        }
+        else
+        {
+          Serial.printf("\r\nUsing SSID:(%s)\r\nThis will feed information for command 'wifi ssid', don't forget your password.\r\n", WiFi.SSID( StrCmdRecv.toInt()-1 ) );
+          StrSSID = WiFi.SSID( StrCmdRecv.toInt()-1 ) ;
+          WiFi.scanDelete(); 
+          delay(1000);
+          stMainInfo.CmdStatus == CMD_TERMINATED ;
+        }
       }
     break ;
+    case CMD_WIFI_SET_MAC :
+    if( stMainInfo.CmdStatus = CMD_REQUIRE_DATA )
+    {
+      Serial.printf("\r\nSet a new MAC Address : %s\r\n", StrCmdRecv.c_str() ) ; 
+      ChangeMacId();
+    }
+    stMainInfo.CmdStatus = CMD_TERMINATED ;
+    break;
     case CMD_IP_INFO :
       if( stMainInfo.CmdStatus == CMD_NOTHING_REQ )
       {
@@ -1032,6 +1170,8 @@ void setup()
   Serial.println( "SDK version : " + String( ESP.getSdkVersion()) );
   Serial.printf("\r\nCPU Frequency : %lu Mhz.\r\n", ESP.getCpuFreqMHz() );
 #endif
+  WifiMode = WIFI_STA; 
+  WiFi.mode((WiFiMode_t)(WifiMode)); 
   //delay(DEFAULT_SLEEP);
   Serial.println("Serial Commander PING");
   Serial.print( HOST_COMMAND_GREET );
