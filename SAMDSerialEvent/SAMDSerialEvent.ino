@@ -2,6 +2,16 @@
 #include <Arduino.h>
 #include <Scheduler.h>
 /*
+ * Source information 
+ * Used library Version 
+ * Scheduler    0.4.4   
+ * U8g2         2.34.22 
+ * SPI          1.0     
+ * Wire         1.0     
+ *
+ * Used platform Version
+ * arduino:samd  1.8.14  
+ *
  * Here the full demonstration of the menu_helper started inside esp8266
  * for SerialEventCommander and SerialCommanderPing. Here the version 
  * that include a SerialEvent for usb-cdc SAMD21 know in generic market as 
@@ -48,9 +58,9 @@
 U8G2_ST7567_OS12864_1_4W_SW_SPI u8g2(U8G2_R0, 
                               /* clock=*/ 13, 
                               /* data= */ 11, 
-                               /* cs=  */  7, 
-                               /* dc=  */  9, 
-                               /* reset=*/ 8 );
+                              /* cs=   */  7, 
+                              /* dc=   */  9, 
+                              /* reset=*/  8 );
 /*
 * End of section
 */
@@ -65,7 +75,7 @@ U8G2_ST7567_OS12864_1_4W_SW_SPI u8g2(U8G2_R0,
 #define DEFAULT_SERIAL_TIMEOUT	    150
 
 #define MAJOR_VERSION               1
-#define MINOR_VERSION               0000005
+#define MINOR_VERSION               0000011
 
 #define PWM_RES                     12
 
@@ -86,11 +96,27 @@ U8G2_ST7567_OS12864_1_4W_SW_SPI u8g2(U8G2_R0,
 u8g2_uint_t offset;			// current offset for the scrolling text
 u8g2_uint_t width;			// pixel width of the scrolling text (must be lesser than 128 unless U8G2_16BIT is defined
 
-const char *text = " XeonServer2650 __TIME__ __TEMP__ ";	// scroll this text from right to left
-const char *textUnderScroll = "Avg: __VALUE__" ;
-const char *textSecnd = "Ref.T.: __VALUE__" ;
-const char *textTime  = "Time: HH:MM:SS" ;
-const char *textPump = "Pump : __MSG__" ;
+/* Template text reference
+ * It's possible to change them, but because some pointer-text own __TIME__ __TEMP__ tag
+ * they will convert __TIME__ into HH:MM:SS from time device, __TEMP__ from bmp280 
+ * and these change occur often as it require a Template and a variable relative to 
+ * own the final change. As example textTitleTpl own __TIME__ and __TEMP__ tag as
+ * once every second the title is scrolling and will update the __TIME__ and __TEMP__ tag
+ * and put everything inside *textTitle and this one will be show in the Display device.
+ * */
+char *textTitleTpl       = " XeonServer2650 __TIME__ __TEMP__ ";	// scroll this text from right to left
+char *textUnderScrollTpl = "Avg: __VALUE__" ;
+char *textSecndTpl       = "Ref.T.: __VALUE__" ;
+char *textTimeTpl        = "Time: HH:MM:SS" ;
+char *textPumpTpl        = "Pump : __MSG__" ;
+/*
+ * Variable where Template-text reference will be deposed.
+ * */
+char *textTitle                = textTitleTpl ;
+char *textUnderScroll          = textUnderScrollTpl ;
+char *textSecnd                = textSecndTpl ;
+char *textTime                 = textTimeTpl ;
+char *textPump                 = textPumpTpl ;
 
 const uint8_t* SetFontName = u8g2_font_inb16_mr ;
 //const uint8_t* SetFontNameSmall = u8g2_font_courR10_tf ; 
@@ -112,25 +138,30 @@ uint_least16_t  longPwmRes  = PWM_RES;
 typedef enum enum_ExprCmd 
 {
   CMD_NONE            = 0,
-	CMD_HELP            = 1,
-	CMD_ABOUT           = 2,
+  CMD_HELP            = 1,
+  CMD_ABOUT           = 2,
   CMD_VERSION         = 3,
   CMD_SET_TIME        = 4,
   CMD_GET_TIME        = 5,
-  CMD_UPDATE_TIME     = 6,
-  CMD_GET_TEMP        = 7,
-  CMD_SET_PUMP_LVL    = 8,
-  CMD_GET_PUMP_LVL    = 9,
-  CMD_SET_COOLING_LVL = 10,
-  CMD_GET_COOLING_LVL = 11,
-  CMD_SET_UNDER_CLV   = 12,
-  CMD_SET_OVER_CLV    = 13,
-  CMD_GET_COOLING_RNG = 14,
-  CMD_REBOOT          = 15,
-  CMD_SAVE            = 16,
-  CMD_LOAD            = 17,
-  CMD_UNKNOW          = 18,
-	CMD_END			        = 19
+  CMD_SET_TITLE       = 6,
+  CMD_SET_TITLE_TUS   = 7,
+  CMD_SET_TITLE_SCND  = 8,
+  CMD_SET_TITLE_TIM   = 9,
+  CMD_SET_TITLE_PUMP  = 10,
+  CMD_UPDATE_TIME     = 11,
+  CMD_GET_TEMP        = 12,
+  CMD_SET_PUMP_LVL    = 13,
+  CMD_GET_PUMP_LVL    = 14,
+  CMD_SET_COOLING_LVL = 15,
+  CMD_GET_COOLING_LVL = 16,
+  CMD_SET_UNDER_CLV   = 17,
+  CMD_SET_OVER_CLV    = 18,
+  CMD_GET_COOLING_RNG = 19,
+  CMD_REBOOT          = 20,
+  CMD_SAVE            = 21,
+  CMD_LOAD            = 22,
+  CMD_UNKNOW          = 23,
+  CMD_END			        = 24
 } ExprCmd ;
 
 typedef enum enum_ExprCmdStatus 
@@ -160,6 +191,11 @@ stCmd_t TableCommand[] = { {CMD_HELP,            "help"                } ,
                            {CMD_VERSION,         "version"             } ,
                            {CMD_SET_TIME,        "set time"            } ,
                            {CMD_GET_TIME,        "get time"            } ,
+                           {CMD_SET_TITLE,       "set title"           } ,
+                           {CMD_SET_TITLE_TUS,   "set title under"     } ,
+                           {CMD_SET_TITLE_SCND,  "set title second"    } ,
+                           {CMD_SET_TITLE_TIM,   "set title time"      } ,
+                           {CMD_SET_TITLE_PUMP,  "set title pump"      } ,
                            {CMD_UPDATE_TIME,     "update time"         } ,
                            {CMD_GET_TEMP,        "get temp"            } ,
                            {CMD_SET_PUMP_LVL,    "set pump power"      } ,
@@ -194,7 +230,7 @@ void ScreenScrollText()
     u8g2.setFont(SetFontName);		              // set the target font
     do 
     {								                            // repeated drawing of the scrolling text...
-      u8g2.drawUTF8(intX, 17, text);		      	// draw the scolling text
+      u8g2.drawUTF8(intX, 17, textTitle);		    // draw the scolling text
       intX += width ;						                // add the pixel width of the scrolling text
     } while( intX < u8g2.getDisplayWidth() );		// draw again until the complete display is filled
     
@@ -330,12 +366,12 @@ void helper_menu( st_HelperInfo &stHelperOut )
   {
 	  case CMD_HELP :
       stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
-      StrMsgRet="Help Menu for the application SAMDSerialCooler\r\nInitially the application is accessible through the serial with a\r\n minimum configuration where you can change it depend of your thermal\r\n specification of you CPU or cooled device where this micro-controller\r\nis equiped to control with an L298N motor driver dedicated to control\r\nthe pump and PWM and mofset and couple of temperature device to manage\r\ncooling of the device. \r\nHere several choice to make it possible to change setting and obtain\r\ninformation for the current running cooler.\r\n\r\nMenu option:\r\nhelp                 This help.\r\nabout                About this application.\r\nversion              Print version of the application.\r\nget time             Report time from the SAMD micro-controller.\r\nset time             Set time manually and update DS130X i2c device.\r\nupdate time          Caliber SAMD timer and extract time from i2c dev.\r\nget temp             Report temperature for some device.\r\nget pump power       Get Pump PWM level information.\r\nset pump power       Set Pump PWM level information.\r\nget cooling power    Get the cooling overall PWM level.\r\nset cooling power    Set the cooling overall PWM level.\r\nset lowest cooling   Set lowest temperature to not exceed.\r\nset highest cooling  Set highest temperature to not exceed.\r\nget cooling range    Report actual limit for lowest/highest temp.\r\nreboot               Reboot the SAMD microntroller and stop the cooling.\r\nsave conf            Save the configuration inside flash.\r\nload conf            Load the configuration from the flash.\r\n";
+      StrMsgRet="Help Menu for the application SAMDSerialCooler\r\nInitially the application is accessible through the serial with a\r\n minimum configuration where you can change it depend of your thermal\r\n specification of you CPU or cooled device where this micro-controller\r\nis equiped to control with an L298N motor driver dedicated to control\r\nthe pump and PWM and mofset and couple of temperature device to manage\r\ncooling of the device. \r\nHere several choice to make it possible to change setting and obtain\r\ninformation for the current running cooler.\r\n\r\nMenu option:\r\nhelp                 This help.\r\nabout                About this application.\r\nversion              Print version of the application.\r\nget time             Report time from the SAMD micro-controller.\r\nset time             Set time manually and update DS130X i2c device.\r\nupdate time          Caliber SAMD timer and extract time from i2c dev.\r\nset title            Change the Big Title in Display.\r\nset title under      Change the Title under the Scrolling title.\r\nset title second     Change the Title second under the Scrolling one.\r\nset title time       Change the Title-Time section.\r\nset title pump       Change the  Title of pump section..\r\nget temp             Report temperature for some device.\r\nget pump power       Get Pump PWM level information.\r\nset pump power       Set Pump PWM level information.\r\nget cooling power    Get the cooling overall PWM level.\r\nset cooling power    Set the cooling overall PWM level.\r\nset lowest cooling   Set lowest temperature to not exceed.\r\nset highest cooling  Set highest temperature to not exceed.\r\nget cooling range    Report actual limit for lowest/highest temp.\r\nreboot               Reboot the SAMD microntroller and stop the cooling.\r\nsave conf            Save the configuration inside flash.\r\nload conf            Load the configuration from the flash.\r\n";
     break;
 
-		case CMD_ABOUT :
+	  case CMD_ABOUT :
       stHelperOut.CmdStatus = CMD_NOTHING_REQ ;
-			StrMsgRet="You reach the about.\r\nThis application is designed for cooling a Xeon processor out of its\r\narea. It's from a genuine based bios-like micro-controller that was\r\nchosen to control efficiently Xeon thermal dissipation from 105 Watts\r\nto over 145 Watts. As limits from family of E5-26XXv4 are not hotter\r\nthan 150 watts, it has been chosen to step a cooling from 2 sets of\r\npelletier and a 30 to 60 watt pump. All  are in DC and are operating\r\nat 12 volts. It's possible to load configuration from a set of\r\nconfiguration. Designed to prevent formation of water in case of\r\nover-cooling, it's designed to load several configuration to correspond\r\nto summer, fall, winter, spring or even garage  to prevent leakage.\r\nThese settings and installation are not install with heater, for winter\r\n garage or even space area.\r\n";
+      StrMsgRet="You reach the about.\r\nThis application is designed for cooling a Xeon processor out of its\r\narea. It's from a genuine based bios-like micro-controller that was\r\nchosen to control efficiently Xeon thermal dissipation from 105 Watts\r\nto over 145 Watts. As limits from family of E5-26XXv4 are not hotter\r\nthan 150 watts, it has been chosen to step a cooling from 2 sets of\r\npelletier and a 30 to 60 watt pump. All  are in DC and are operating\r\nat 12 volts. It's possible to load configuration from a set of\r\nconfiguration. Designed to prevent formation of water in case of\r\nover-cooling, it's designed to load several configuration to correspond\r\nto summer, fall, winter, spring or even garage  to prevent leakage.\r\nThese settings and installation are not install with heater, for winter\r\n garage or even space area.\r\n";
 		break;
 
     case CMD_VERSION :
@@ -346,6 +382,31 @@ void helper_menu( st_HelperInfo &stHelperOut )
     case CMD_SET_TIME :
       stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
       StrMsgRet="Set time manually and update present DS130X i2c device.\r\n";
+    break ;
+    
+    case CMD_SET_TITLE:
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      StrMsgRet="Change the big-title of the Display device.\r\nTemplate title:["+ String(textTitleTpl)+"]\r\nNew Title:";
+    break ;
+
+    case CMD_SET_TITLE_TUS:
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      StrMsgRet="Change the title under the scrolling title of the Display device.\r\nTemplate title:["+ String(textUnderScrollTpl)+"]\r\nNew Title:";
+    break ;
+    
+    case CMD_SET_TITLE_SCND:
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      StrMsgRet="Change the second title under the scrolling title of the Display device.\r\nTemplate title:["+ String(textSecndTpl)+"]\r\nNew Title:";
+    break ;
+
+    case CMD_SET_TITLE_TIM:
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      StrMsgRet="Change the time-title of the Display device.\r\nTemplate title:["+ String(textTimeTpl)+"]\r\nNew Title:";
+    break ;
+
+    case CMD_SET_TITLE_PUMP:
+      stHelperOut.CmdStatus = CMD_REQUIRE_DATA;
+      StrMsgRet="Change the pump title of the Display device.\r\nTemplate title:["+ String(textPumpTpl)+"]\r\nNew Title:";
     break ;
 
     case CMD_GET_TIME :
@@ -447,6 +508,71 @@ void MenuAction( st_HelperInfo &stMainInfo )
       stMainInfo.CmdStatus = CMD_TERMINATED ; 
     break ;
 
+    case CMD_SET_TITLE:
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        SerialUSB.print("New Title:[ " + StrCmdRecv + "]\r\n" );
+        
+        size_t iLength = strlen( StrCmdRecv.c_str() ) + 1 ; 
+        textTitleTpl = ( char* )malloc( iLength * sizeof(char) ) ;
+        strcpy(textTitleTpl, (char*)(StrCmdRecv.c_str() ));
+        textTitle=textTitleTpl;
+      }
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
+    break;
+    
+    case CMD_SET_TITLE_TUS:
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        SerialUSB.print("New Title:[ " + StrCmdRecv + "]\r\n" );
+        
+        size_t iLength = strlen( StrCmdRecv.c_str() ) + 1 ; 
+        textUnderScrollTpl = ( char* )malloc( iLength * sizeof(char) ) ;
+        strcpy(textUnderScrollTpl, (char*)(StrCmdRecv.c_str() ));
+        textUnderScroll=textUnderScrollTpl;
+      }
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
+    break;
+    
+    case CMD_SET_TITLE_SCND:
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        SerialUSB.print("New Title:[ " + StrCmdRecv + "]\r\n" );
+        
+        size_t iLength = strlen( StrCmdRecv.c_str() ) + 1 ; 
+        textSecndTpl = ( char* )malloc( iLength * sizeof(char) ) ;
+        strcpy(textSecndTpl, (char*)(StrCmdRecv.c_str() ));
+        textSecnd=textSecndTpl;
+      }
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
+    break;
+    
+    case CMD_SET_TITLE_TIM:
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        SerialUSB.print("New Title:[ " + StrCmdRecv + "]\r\n" );
+        
+        size_t iLength = strlen( StrCmdRecv.c_str() ) + 1 ; 
+        textTimeTpl = ( char* )malloc( iLength * sizeof(char) ) ;
+        strcpy(textTimeTpl, (char*)(StrCmdRecv.c_str() ));
+        textTime=textTimeTpl;
+      }
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
+    break;
+    
+    case CMD_SET_TITLE_PUMP:
+      if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
+      {
+        SerialUSB.print("New Title:[ " + StrCmdRecv + "]\r\n" );
+        
+        size_t iLength = strlen( StrCmdRecv.c_str() ) + 1 ; 
+        textPumpTpl = ( char* )malloc( iLength * sizeof(char) ) ;
+        strcpy(textPumpTpl, (char*)(StrCmdRecv.c_str() ));
+        textPump=textPumpTpl;
+      }
+      stMainInfo.CmdStatus = CMD_TERMINATED ; 
+    break;
+    
     case CMD_SET_PUMP_LVL :
       if( stMainInfo.CmdStatus == CMD_REQUIRE_DATA )
       {
@@ -617,14 +743,6 @@ void ActionHandler()
 
 void setup() 
 {
-  
-  StrReadTerm.reserve( uart_buffer_size/8 );
-  SerialUSB.begin(TERMINAL_BAUD_SPEED);
-  while ( !SerialUSB )
-  {
-    delay(10);
-  }
-  //SerialUSB.setTimeout( DEFAULT_SERIAL_TIMEOUT ) ;
 /*
 * LCD SPI ST7567 1.8 inch no backlight
   section:
@@ -634,13 +752,23 @@ void setup()
   //u8g2.setFont(u8g2_font_inb30_mr);	// set the target font to calculate the pixel width
   u8g2.setFont( SetFontName) ;
   //u8g2.setFont( u8g2_font_inr16_mn ) ; 
-  width = u8g2.getUTF8Width(text);		// calculate the pixel width of the text
+  width = u8g2.getUTF8Width(textTitle);		// calculate the pixel width of the text
   //width = width * 2 ;
   u8g2.setContrast(0);
   u8g2.setFontMode(0);		// enable transparent mode, which is faster
+  Scheduler.startLoop( ScreenScrollText ); 
 /*
 * End of section
 */
+
+  StrReadTerm.reserve( uart_buffer_size/8 );
+  SerialUSB.begin(TERMINAL_BAUD_SPEED);
+  while ( !SerialUSB )
+  {
+    delay(10);
+  }
+  //SerialUSB.setTimeout( DEFAULT_SERIAL_TIMEOUT ) ;
+
   delay(DEFAULT_SLEEP);
   SerialUSB.print("\r\n") ; 
   SerialUSB.println( "BOOTING" );
@@ -648,7 +776,6 @@ void setup()
   SerialUSB.println( String( HOSTNAME ) + " Version " + String(MAJOR_VERSION) +"."+ String(MINOR_VERSION)+ "\r\n");
   SerialUSB.print( HOST_COMMAND_GREET );
   
-  Scheduler.startLoop( ScreenScrollText );
   Scheduler.startLoop( ActionHandler );
 }
 
