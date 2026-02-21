@@ -1,0 +1,4 @@
+#!/bin/bash 
+declare -A BuildProperty
+BuildProperty["compiler.c.extra_flags"]="-DTERMINAL_BAUD=9600 -DSHIFT_REG_COUNT_BIT=8 "
+BuildProperty["compiler.cpp.extra_flags"]="-DTERMINAL_BAUD=9600 -DSHIFT_REG_COUNT_BIT=8 "
