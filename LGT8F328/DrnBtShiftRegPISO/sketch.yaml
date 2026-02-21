@@ -1,0 +1,4 @@
+default_fqbn: lgt8fx:avr:328:variant=modelP-wemos-TTGO-XI 
+always_export_binaries: true
+default_port: /dev/ttyACM0
+
