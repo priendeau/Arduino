@@ -1,0 +1,3 @@
+alias load_BuildProperty='eval $( ACTION=load BPArrayName=BuildProperty arrayBuildProperty )'
+alias view_BuildProperty='ACTION=view BPArrayName=BuildProperty arrayBuildProperty'
+alias save_BuildProperty='ACTION=save BPArrayName=BuildProperty arrayBuildProperty'
