@@ -1,3 +1,4 @@
+alias arduino-cli='time /usr/local/bin/arduino-cli --config-file /home/${USER}/.arduinoIDE/arduino-cli.yaml '
 alias load_BuildProperty='eval $( ACTION=load BPArrayName=BuildProperty arrayBuildProperty )'
 alias view_BuildProperty='ACTION=view BPArrayName=BuildProperty arrayBuildProperty'
 alias save_BuildProperty='ACTION=save BPArrayName=BuildProperty arrayBuildProperty'
