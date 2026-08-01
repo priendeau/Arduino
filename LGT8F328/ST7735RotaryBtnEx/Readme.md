@@ -1,4 +1,4 @@
-## application ST7735RotaryBtnEx.ino
+## Application ST7735RotaryBtnEx.ino
 
 ## What is a Rotary Switch.
 
