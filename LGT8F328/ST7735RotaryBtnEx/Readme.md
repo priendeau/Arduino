@@ -18,8 +18,8 @@ The second image appear when you push the rotary itself and at the left of title
 |--------------------|--------------------|--------------------------------------------|
 |       U1           |         1          | LGT8F328 QFN32                             |
 |       U2           |         1          | ST7735 80x160 pixel 65k/282k color         |
-|       C1           |         1          | 220 uF, 6.3 V Polarized Capacitor          |
-|       R1-R2        |         2          | 4.7 k\u2126 Resistor @3.3Volts / 10K K\u2126 @5V     |
+|       C1           |         1          | 470 uF, 6.3 V Polarized Capacitor          |
+|       R1-R2        |         2          | 4.7 k Ohms Resistor @3.3Volts / 10K K Ohms @5V     |
 |       RS1          |         1          | Rotary Switch 3v3/5V                       |
 |       PB1-PB2      |         2          | Push Button                                |
 |                    |                    |                                            |
@@ -27,6 +27,15 @@ The second image appear when you push the rotary itself and at the left of title
  
 
 ## Arduino Schema to follow:
-Not Yet here,
+In this activity we will offer a 2 kind of connection for button as it's also possible to remove an interrupt over PIN 3 which is use KEY connection from the rotary and uses attachInterrupt() from arduino core to bind a function switchInterrupt() which can barely replaced by function buttonPressed(). This will be covered later.
 
+In this activity we will also offer an alternative using switch compilation to transfer all the button press activity into an Watchdog offer by DBUZA core involving coding insede the ISR (WDT_vect) function. We will also see if 256 millisecond is enough for triggering button.
+
+### This is the first method as demonstration 
+Here the connection for the following activity.
+Note: The LGT8F328 in the middle of the image have a top pinout totally compatible with FTDI-232 and even if the CTS pin is connect to ground it does transmit well. The Application to draw does not offer an FTDI front facing the LGT8F328 chip but belong to configuration, the top FTDI chip should face  the LGT8F328 chip to flash the chip correctly.
+
+![](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/schema_ST7735RotaryBtnEx.png)Reference: https://app.cirkitdesigner.com/project/695bf364-b612-4602-a3c6-b5d8ee982562
+
+Don't forget to put the power ! It use the default FTDI Vcc/Ground pin to allow feeding the design but it's strongly recommended to use battery, USB connector, breadboard power supply like the breadboard image on the left show a default dual 3V3 and 5V powering from AMS1117 and connection from 12volts to 3v3/5v or using the USB and source.
 
