@@ -190,6 +190,7 @@ And start to be heavy for only compilation and debugging, the arduino-compile wa
 As arduino-compile own its own number of job for compilation, having too much parallel compilation can sometimes stop your system to work I do suggest to create an alias for arduino-compile with your number of available core for compiling. Designed on a Xeon E5 2650v4 it own 12 core let use some shell command to help you designing a not to aggressive workload:
 
 **bash**
+
 How many core you have :
 
     grep "cpu cores" /proc/cpuinfo | head -n1 | cut -d: -f 2
