@@ -122,13 +122,19 @@ Adafruit ST7735 and ST7789 Library 1.11.0
 #define WATCHDOG_ISR_WAIT           WATCHDOG_ISR_WAIT_TIME
 #endif
 
+#if !defined( SW_ENCDR_PIN )
+#define SW_ENCDR                    3
+#else
+#define SW_ENCDR                    SW_ENCDR_PIN
+#endif
+
 // Pin Configuration 
 /*
  * Encoder only with self push-buton.
  * */
 #define ENCDR_A                           2
 #define ENCDR_B                           4
-#define SW_ENCDR                          3
+//#define SW_ENCDR                          3
 #define SW_BACK                           5
 #define SW_CONF                           6
 
@@ -238,7 +244,11 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
  * */
 void updateScreen( void ) ; 
 void rotaryInterrupt( void ) ;
+
+#ifndef NO_BTN_IN_ISR
 void switchInterrupt( void ) ;
+#endif
+
 bool buttonPressed(int pin) ; 
 void AnimCircle( int xLoc, int yLoc , int *iPtrRad, long *lPtrColorList, int iRepeat, int iDelay) ;
 
@@ -246,6 +256,7 @@ void AnimCircle( int xLoc, int yLoc , int *iPtrRad, long *lPtrColorList, int iRe
 #ifdef WITH_WDT_LGT8F
 volatile bool   isrflag              = true;
 #endif
+
 volatile bool   lastRotA             = false;
 volatile bool   rotarySwitchPressed  = false;
 volatile bool   backSwitchPressed    = false;
@@ -259,16 +270,16 @@ bool            IsCounterClkWise     = false ;
 
 
 //Global variables
-const int       ledPin            = LED_CTRL_PIN; // Led to start when micro-controller is working.
-int             timeout           = 0 ;
-int             iLoopCount        = 0 ; 
+const int       ledPin             = LED_CTRL_PIN; // Led to start when micro-controller is working.
+int             timeout            = 0 ;
+int             iLoopCount         = 0 ; 
 bool            bTimeOutFlag       = true;
 
 long lColorList[] = { ST77XX_NEON_GREEN,   ST77XX_NEON_GREEN_LIGHT,    ST77XX_BLACK,       ST77XX_BLACK, 
                       ST77XX_GREEN_LIME,   ST77XX_BLACK,               ST77XX_BLACK,       ST77XX_GREEN_OLIVE, 
-		                  ST77XX_BLACK,        ST77XX_BLACK,               ST77XX_DARK_LIME,   ST77XX_BLACK, 
-		                  ST77XX_BLACK,        ST77XX_DARK_OLIVE,          ST77XX_BLACK,       ST77XX_BLACK, 
-		                  ST77XX_GREEN_FOREST, ST77XX_BLACK,               ST77XX_BLACK,       ST77XX_NEON_GREEN } ; 
+		      ST77XX_BLACK,        ST77XX_BLACK,               ST77XX_DARK_LIME,   ST77XX_BLACK, 
+		      ST77XX_BLACK,        ST77XX_DARK_OLIVE,          ST77XX_BLACK,       ST77XX_BLACK, 
+		      ST77XX_GREEN_FOREST, ST77XX_BLACK,               ST77XX_BLACK,       ST77XX_NEON_GREEN } ; 
 
 int iRadiusList[] = { 3, 5 } ;
 
@@ -281,10 +292,10 @@ void AnimCircle( int xLoc, int yLoc , int *iPtrRad, long *lPtrColorList, int iRe
     {
       for( int iCol = 0 ; iCol <= ( int )(sizeof( lPtrColorList ))-1 ; iCol++ )
       {
-	      tft.fillCircle(xLoc, yLoc, ( int16_t )( *(iPtrRad+iCRad) ), ( int16_t )( *(lPtrColorList+iCol) ) );
-	      //delay(GEN_WAIT_VAL/4);
-	      delay(iDelay);
-	      tft.fillCircle(xLoc, yLoc, ( int16_t )( *(iPtrRad+iCRad) ), ST77XX_BLACK );
+	     tft.fillCircle(xLoc, yLoc, ( int16_t )( *(iPtrRad+iCRad) ), ( int16_t )( *(lPtrColorList+iCol) ) );
+	     //delay(GEN_WAIT_VAL/4);
+	     delay(iDelay);
+	     tft.fillCircle(xLoc, yLoc, ( int16_t )( *(iPtrRad+iCRad) ), ST77XX_BLACK );
       }
     }
   }
@@ -313,6 +324,7 @@ void rotaryInterrupt( void )
 // Rotary encoder was pressed
 //---------------------------------------------------------------------
 
+#ifndef NO_BTN_IN_ISR
 void switchInterrupt( void )
 {
 #ifdef DEBOUNCING_SW
@@ -370,6 +382,7 @@ void switchInterrupt( void )
   //rotarySwitchPressed = buttonPressed( SW_ENCDR );
 #endif
 }
+#endif
 
 bool buttonPressed(int pin)
 {
@@ -394,25 +407,50 @@ bool buttonPressed(int pin)
 
 void UpdatePressAction( void )
 {
+#ifdef NO_BTN_IN_ISR
+  if (buttonPressed( SW_ENCDR ))
+  {
+    //Serial.println("Rotary Switch Pressed");
+    rotarySwitchPressed=true;
+    update = true;
+  }
+#else
   if (rotarySwitchPressed)
   {
     //Serial.println("Rotary Switch Pressed");
     update = true;
   }
-  
+#endif
+
+#ifndef BTN_IN_WDT  
   if (buttonPressed( SW_BACK ))
   {
     //Serial.println("Rotary Switch Pressed");
     backSwitchPressed=true;
     update = true;
   }
+#else
+  if (backSwitchPressed)
+  {
+    //Serial.println("Rotary Switch Pressed");
+    update = true;
+  }
+#endif
 
+#ifndef BTN_IN_WDT 
   if (buttonPressed( SW_CONF ))
   {
     //Serial.println("Rotary Switch Pressed");
     confirmSwitchPressed=true;
     update = true;
   }
+#else
+  if (confirmSwitchPressed)
+  {
+    //Serial.println("Rotary Switch Pressed");
+    update = true;
+  }
+#endif
   
   if (rotaryMovement != 0)
   {
@@ -523,7 +561,11 @@ void updateScreen( void )
 ISR (WDT_vect)
 {
   isrflag = true;
-  
+#ifdef BTN_IN_WDT
+  backSwitchPressed    = buttonPressed( SW_BACK ) ;
+  confirmSwitchPressed = buttonPressed( SW_CONF ) ; 
+  rotarySwitchPressed  = buttonPressed( SW_ENCDR ) ;
+#endif  
 }
 #endif
 
@@ -569,7 +611,9 @@ void setup()
   digitalWrite(ledPin, HIGH);
 #endif
   
+#ifndef NO_BTN_IN_ISR
   attachInterrupt(digitalPinToInterrupt(SW_ENCDR), switchInterrupt, FALLING );
+#endif
   attachInterrupt(digitalPinToInterrupt(ENCDR_A), rotaryInterrupt, CHANGE);
   
   
