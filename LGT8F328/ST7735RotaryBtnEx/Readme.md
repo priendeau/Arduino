@@ -381,7 +381,8 @@ recompile:
 
     arduino-compile
 **output**
-
+	
+	Sketch uses 16654 bytes (56%) of program storage space. Maximum is 29696 bytes.
     Global variables use 581 bytes (28%) of dynamic memory, leaving 1467 bytes for 	local variables. Maximum is 2048 bytes.
 
 	Used library                       Version Path
