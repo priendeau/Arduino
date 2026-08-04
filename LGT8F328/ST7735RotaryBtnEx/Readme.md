@@ -284,7 +284,10 @@ Deleting the DEBUG_USB_SERIAL:
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+	for item in ${ArrayKey[@]} ; do 
+	  ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
+	done
 This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Beware if you only put :
 
     ACTION=DEL KEY=${item} arrayBuildProperty
@@ -318,7 +321,10 @@ So to fully use the Watchdog ISR function and detach the button from the rotary 
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+	for item in ${ArrayKey[@]} ; do 
+	  ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
+	done
 
 and recompile:
 
@@ -344,7 +350,10 @@ and recompile:
 ### Looking at the initial definition:
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+	for item in ${ArrayKey[@]} ; do 
+	  ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
+	done
 
 recompile:
 
@@ -373,7 +382,7 @@ Ok it remove 24 bytes but merely rewritten few line and trowed out an attachInte
 
     declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
     for item in ${ArrayKey[@]} do 
-        ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; 
+        ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
     done
 recompile:
 
