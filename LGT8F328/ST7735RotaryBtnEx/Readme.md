@@ -274,7 +274,10 @@ As activity, adding the compilation switch DEBUG_USB_SERIAL to see an ouput.
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done 
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+    for item in ${ArrayKey[@]} ; do 
+      ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
+    done 
 Or:
 
     ACTION=ADD KEY=compiler.c.extra_flags VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty
