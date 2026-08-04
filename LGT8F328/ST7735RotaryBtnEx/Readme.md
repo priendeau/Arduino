@@ -2,6 +2,8 @@
 
 ## What is a Rotary Switch.
 
+![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/rotary_encoder_ec11_pinout-small.png)
+
 Rotary Switch are infinite roll action giving possibility to never block the rolling action. As example a volume roll does depend of the internal resistance and somewhat using variable resistance. A rotary does only report in a form of quadrature encoding if it clench between a position to another and through Pin S1/S2 it held information if the rotary is moving in clock direction or counter clock direction. Difference between S1 and S2 is S2 is 90 degree shift phase and will not report an LOW statement immediately it's S1 that perform an instant switch. While S2 take a fraction of turn it inform the micro-controller is going in the clock rotation direction or counter clock direction. 
 
 ## Description of the activity.
@@ -84,10 +86,13 @@ A default command is also good to perform and this one is also store inside alia
 
     arduino-cli --config-file /home/${USER}/.arduinoIDE/arduino-cli.yaml config init
 
-Note: Once arduino-cli is installed you can output all information in text which is by default. Outputting them into json and recover the content from python interpreter is a good thing to do if you want to keep the information and still be visual to seek for information. Few space in this repository does offer alternative to manage arduino-cli as visual interface using tkinter which is not demonstrated here but possible to use to enjoy and let your system suffer less from memory exhaustion because Arduino IDE is relatively huge and consume a lot of memory to perform an imitation on Intelli-Sense(1) accessing to your code with bubble and windows.
+Note: Once arduino-cli is installed you can output all information in text which is by default. Outputting them into JSON and recover the content from python interpreter is a good thing to do if you want to keep the information and still be visual to seek for information. Few space in this repository does offer alternative to manage arduino-cli as visual interface using tkinter which is not demonstrated here but possible to use to enjoy and let your system suffer less from memory exhaustion because Arduino IDE is relatively huge and consume a lot of memory to perform an imitation on Intelli-Sense(1) accessing to your code with bubble and windows.
 
 ## What is holding your configuration file for arduino-cli ?
-Everything inside the configuration file is written in a jsonlib like format. It does not hold symbols in form of <element>value</element> like XML but own a specific text validation when it's time to add several's line like the core element require a '-' dash at every line. It's call YAML and does turn into json. As example here the installation of dbuezas core should require your arduino-cli to work with a switch parameter if you haven't add yourself the dbuezas core with Arduino IDE you can point your arduino IDE configuration by arduino-cli as long you know where is the path. Usually it stand around "/home/${USER}/.arduinoIDE/arduino-cli.yaml" Where ${USER} is your default linux logged user. 
+Everything inside the configuration file is written in a YAML format. It does not hold symbols in form of <element>value</element> like XML but own a specific text validation when it's time to add several's line like the core element require a '-' dash at every line. As example here the installation of dbuezas core should require your arduino-cli to work with a switch parameter if you haven't add yourself the dbuezas core with Arduino IDE you can point your Arduino IDE configuration by arduino-cli as long you know where is the path. Usually it stand around "/${HOME}/.arduinoIDE/arduino-cli.yaml" Where ${HOME} is your default Linux user home. 
+
+## An exception
+Bad news, installing only the dbuezas core does not include installing the flash tools to flash. It uses ftdi-232 and avrdude as software to enable Arduino communicating. Installing Arduino IDE can solve yourself to find a compatible avrdude configuration or start looking to installing independently avrdude version 8.0 at least. Or even installing a core that do install the avrdude. Arduino, MegaCoreX, MiniCore  fit the most in the well installed and optimized avrdude version. Installing Arduino core also offer a avrdude version 6.3 tuned for CH340 serial communication gateway, as ftdi-232 is an all compatible too. In this case there is a demonstration of avrdude by the shell because this activity export the binary and let make it available for flashing.
 
 ### Long-long way to use arduino-cli 
 This long-long and heavy command line stand in using the switch from arduio-cli and everytime you want to install or update the dbuezas core will require this line to exist either inside the aliasrc or from the history (discouraged). 
@@ -284,5 +289,117 @@ This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Bewar
 
     ACTION=DEL KEY=${item} arrayBuildProperty
    This will erase the whole ${item} as key Defined into a enumeration of the key by using an inline array declaration it will suppress both key compiler.c.extra_flags and compiler.cpp.extra_flags, so beware, or load it again and only save when the test are done.
+
+
+## Compilation Switches example.
+In this activity the micro-controller and the rotary switch and buttons including the rotary switch button may run in severals way and #define clause were developed to show characteristic of the dbuezas core and the original coding for arduino-core and how to change some elements. The definition as changing some elements can be the KEY of the rotary switch and where on the micro-controller it going to be associated. The other characteristic of the activity are moving where the button answer are treated, as speed response from changing the Watchdog respond time. And finally comparaison of using some switch. Using the exclusion of the Watchdog does weight in the balance but personally it's a good deal as alternative to attachInterrupt() to use the Watchdog function vector interrupt seems to be seamless.  
+
+As you can use an alias to view the concurrent Array with arrayBuildProperty, be sure you start with the repository version or .BuildProperty :
+
+**bash**
+
+    load_BuildProperty
+    ACTION=view arrayBuildProperty
+ 
+ **output**
+		
+	View BuildProperty information.
+    Key --export-binaries	        Value:
+    Key compiler.c.extra_flags	    Value:-DTERMINAL_BAUD=9600 -DLED_CTRL=12 -DANALOG_RESOLUTION=10 -DGEN_SLEEP_WAIT=1000 -DI2C_SLAVE_ADDR_MSG=0x55 -DI2C_CLOCK_FREQ=400000 -DFLEX_WIRE_PORT_SCL=A0 -DFLEX_WIRE_PORT_SDA=A1 -DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F
+    Key compiler.cpp.extra_flags	Value:-DTERMINAL_BAUD=9600 -DLED_CTRL=12 -DANALOG_RESOLUTION=10 -DGEN_SLEEP_WAIT=1000 -DI2C_SLAVE_ADDR_MSG=0x55 -DI2C_CLOCK_FREQ=400000 -DFLEX_WIRE_PORT_SCL=A0 -DFLEX_WIRE_PORT_SDA=A1 -DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F
+    Key --output-dir	            Value:build/lgt8fx.avr.328
+
+At the key compiler.c.extra_flags and compiler.cpp.extra_flags we have the option "-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F". This is one of the default #define clause developed. It use use the Watchdog, but without other #define clause and belong to the code, there is inside 2 attachInterrupt(), one for rotaryInterrupt() and one for the switchInterrupt(). If you look inside the Watchdog ISR function there is only isrflag=true to determine if it pass inside the Watchdog function and belong to the loop() function in less than 5000 ms as expected before it yield an timeout the isrflag can be reset around 9 times in 5000ms and offering you 18 possible trigger to survey for touching something and react. But using the attachInterrupt() function add a possible check up behaving out of the consideration and not passing by the interrupt leave the micro-controller falling in the timeout if it hit the attachInterrupt() for too long, like you can't use switchInterrupt() function with define DEBOUNCING_SW as option and changing the code to spend 10000 cycle checking if the rotary switch have been pulled it will exhaust and might delay the pushing reaction of button to be late or not recorded. But it stand in the definition to add #define . 
+
+### Fully using the Watchdog ?
+This activity was conceived to fully change the button interrupt to stiff the rotary switch button to be part of the watch dog. But I also make it out of the Interrupt and being out of the watchdog too. Using those two switch will render the button over the rotary untreated and no reaction will occur. But using the Watchdog only for all the action including the rotary roll, not at this moment. This activity was also designed to test another rotary switch as replacement witch different qualification and here I show it does not change the code itself. And assuming the next activity was also to impair a rotary from a key not treated with attachInterrupt() of the function switchInterrupt() into a Watchdog function and adding the second rotary switch to also change the value show at the screen. 
+
+So to fully use the Watchdog ISR function and detach the button from the rotary switch and make all the other button being handled by the Watchdog ISR function, add this following with arrayBuilder:
+
+**bash**
+
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+
+and recompile:
+
+**bash**
+
+    arduino-compile
+**output**
+
+    Sketch uses 16888 bytes (56%) of program storage space. Maximum is 29696 bytes.
+	Global variables use 583 bytes (28%) of dynamic memory, leaving 1465 bytes for local variables. Maximum is 2048 bytes.
+
+	Used library                       Version Path
+	WDT                                        ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/WDT
+	SPI                                1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/SPI
+	Adafruit GFX Library               1.12.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_GFX_Library
+	Adafruit BusIO                     1.17.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_BusIO
+	Wire                               1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/Wire
+	Adafruit ST7735 and ST7789 Library 1.11.0  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_ST7735_and_ST7789_Library
+	
+	Used platform Version Path
+	lgt8fx:avr    2.0.7   ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7
+
+### Looking at the initial definition:
+**bash**
+
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+
+recompile:
+
+**bash**
+
+    arduino-compile
+**output**
+
+    Sketch uses 16864 bytes (56%) of program storage space. Maximum is 29696 bytes.
+	Global variables use 583 bytes (28%) of dynamic memory, leaving 1465 bytes for local variables. Maximum is 2048 bytes.
+
+	Used library                       Version Path
+	WDT                                        ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/WDT
+	SPI                                1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/SPI
+	Adafruit GFX Library               1.12.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_GFX_Library
+	Adafruit BusIO                     1.17.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_BusIO
+	Wire                               1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/Wire
+	Adafruit ST7735 and ST7789 Library 1.11.0  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_ST7735_and_ST7789_Library
+
+	Used platform Version Path
+	lgt8fx:avr    2.0.7   ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7
+
+Ok it remove 24 bytes but merely rewritten few line and trowed out an attachInterrupt() call. Let's updating your micro-controller with avrdude ( explain at the end ). Those can test will see no difference at this moment and you save in Arduino core call. By calling WDT.h library which hold code in assembly for managing the watchdog. Now removing all trace of the watchdog for pretending porting the code in full Arduino and having no idea if the assembly code will work for an atmega328p ?
+
+**bash**
+
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+    for item in ${ArrayKey[@]} do 
+        ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; 
+    done
+recompile:
+
+**bash**
+
+    arduino-compile
+**output**
+
+    Global variables use 581 bytes (28%) of dynamic memory, leaving 1467 bytes for 	local variables. Maximum is 2048 bytes.
+
+	Used library                       Version Path
+	SPI                                1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/SPI
+	Adafruit GFX Library               1.12.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_GFX_Library
+	Adafruit BusIO                     1.17.4  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_BusIO
+	Wire                               1.0     ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7/libraries/Wire
+	Adafruit ST7735 and ST7789 Library 1.11.0  ${HOME}/Documents/Arduino/Sketches/libraries/Adafruit_ST7735_and_ST7789_Library
+
+	Used platform Version Path
+	lgt8fx:avr    2.0.7   ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7
+
+Inside used library, it confirm the WDT is scrapped of the list so the total cost of fully externalize the 2 buttons including another button on the rotary switch through the WDT and make only one attachInterrupt() call it cost 234 bytes. It's not the end of the world but personally another ISR function while most atmega328p and LGT8F328 can only onw 2 attachInterrupt() one on the pin2 and one on the pin 3 it's like an extra function working at interleave N offering another possibility to manage the changing in pin state. 
+
+### The one that does not work from ISR. 
+Using #define from excluding Button inside the ISR in prediction to use the WDT by having both "-DWITH_WDT_LGT8F" and "-DNO_BTN_IN_ISR" which all button being handled by a non ISR function which is apparently slower if processed inside function UpdatePressAction(). It's up to you to test. 
+
+### Missmatching with #WITH_WDT_LGT8F
+by telling you, your addition with ACTION=ADD arrayBuilderProperty, you forget to add "-DWITH_WDT_LGT8F" but add "-DBTN_IN_WDT", and "-DNO_BTN_IN_ISR". Button are officially removed from attachInterrupt() and nothing belong to the rotary switch button is handled by no attachInterrupt() and no WDT() ? Your are going to get not reaction from the rotary switch button because the UpdatePressAction() does react to NO_BTN_IN_ISR and the button in the WDT while the code for WDT is not present. It work, for rotary action to roll and react to the direction, button from "CONF" and "BACK" will respond but only them. 
 
 
