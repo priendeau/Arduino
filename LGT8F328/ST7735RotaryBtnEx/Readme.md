@@ -16,15 +16,16 @@ The second image appear when you push the rotary itself and at the left of title
 
 ## Bill of Material:
 
-|        Name        |      Quantity      |                  Component                 |
-|--------------------|--------------------|--------------------------------------------|
-|       U1           |         1          | LGT8F328 QFN32                             |
-|       U2           |         1          | ST7735 80x160 pixel 65k/282k color         |
-|       C1           |         1          | 470 uF, 6.3 V Polarized Capacitor          |
-|       R1-R2        |         2          | 4.7 k\u2126 Resistor @3.3Volts / 10K K\u2126 @5V     |
-|       RS1          |         1          | Rotary Switch 3v3/5V                       |
-|       PB1-PB2      |         2          | Push Button                                |
-|                    |                    |                                            |
+|     Name      | Quantity |                  Component                      |
+|---------------|----------|-------------------------------------------------|
+|    U1         |    1     | LGT8F328 QFN32                                  |
+|    U2         |    1     | ST7735 80x160 pixel 65k/282k color              |
+|    U3         |    1     | 4 bridged Level voltage translator schema/chip  |
+|    C1         |    1     | 470 uF, 6.3 V Polarized Capacitor               |
+|    R1-R2      |    2     | 4.7 k\u2126 Resistor @3.3Volts / 10K K\u2126 @5V          |
+|    RS1        |    1     | Rotary Switch 3v3/5V                            |
+|    PB1-PB2    |    2     | Push Button                                     |
+|               |          |                                                 |
 
  
 
@@ -274,10 +275,7 @@ As activity, adding the compilation switch DEBUG_USB_SERIAL to see an ouput.
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
-    for item in ${ArrayKey[@]} ; do 
-      ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
-    done 
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done 
 Or:
 
     ACTION=ADD KEY=compiler.c.extra_flags VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty
@@ -287,10 +285,7 @@ Deleting the DEBUG_USB_SERIAL:
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
-	for item in ${ArrayKey[@]} ; do 
-	  ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
-	done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done
 This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Beware if you only put :
 
     ACTION=DEL KEY=${item} arrayBuildProperty
@@ -324,10 +319,7 @@ So to fully use the Watchdog ISR function and detach the button from the rotary 
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
-	for item in ${ArrayKey[@]} ; do 
-	  ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
-	done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
 
 and recompile:
 
@@ -353,10 +345,7 @@ and recompile:
 ### Looking at the initial definition:
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
-	for item in ${ArrayKey[@]} ; do 
-	  ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
-	done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
 
 recompile:
 
@@ -385,7 +374,7 @@ Ok it remove 24 bytes but merely rewritten few line and trowed out an attachInte
 
     declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
     for item in ${ArrayKey[@]} do 
-        ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
+        ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; 
     done
 recompile:
 
@@ -393,8 +382,7 @@ recompile:
 
     arduino-compile
 **output**
-	
-	Sketch uses 16654 bytes (56%) of program storage space. Maximum is 29696 bytes.
+
     Global variables use 581 bytes (28%) of dynamic memory, leaving 1467 bytes for 	local variables. Maximum is 2048 bytes.
 
 	Used library                       Version Path
@@ -407,7 +395,7 @@ recompile:
 	Used platform Version Path
 	lgt8fx:avr    2.0.7   ${HOME}/.arduino15/packages/lgt8fx/hardware/avr/2.0.7
 
-Inside used library, it confirm the WDT is scrapped of the list so the total cost of fully externalize the 2 buttons including another button on the rotary switch through the WDT and make only one attachInterrupt() call it cost 234 bytes. It's not the end of the world but personally another ISR function while most atmega328p and LGT8F328 can only onw 2 attachInterrupt() one on the pin2 and one on the pin 3 it's like an extra function working at interleave N offering another possibility to manage the changing in pin state. 
+Inside used library, it confirm the WDT is scrapped of the list so the total cost of fully externalize the 2 buttons including another button on the rotary switch through the WDT and make only one attachInterrupt() call it cost 234 bytes. It's not the end of the world but personally another ISR function while most atmega328p and LGT8F328 can only own 2 attachInterrupt() one on the pin2 and one on the pin 3 it's like an extra function working at interleave N offering another possibility to manage the changing in pin state. 
 
 ### The one that does not work from ISR. 
 Using #define from excluding Button inside the ISR in prediction to use the WDT by having both "-DWITH_WDT_LGT8F" and "-DNO_BTN_IN_ISR" which all button being handled by a non ISR function which is apparently slower if processed inside function UpdatePressAction(). It's up to you to test. 
@@ -415,4 +403,39 @@ Using #define from excluding Button inside the ISR in prediction to use the WDT 
 ### Missmatching with #WITH_WDT_LGT8F
 by telling you, your addition with ACTION=ADD arrayBuilderProperty, you forget to add "-DWITH_WDT_LGT8F" but add "-DBTN_IN_WDT", and "-DNO_BTN_IN_ISR". Button are officially removed from attachInterrupt() and nothing belong to the rotary switch button is handled by no attachInterrupt() and no WDT() ? Your are going to get not reaction from the rotary switch button because the UpdatePressAction() does react to NO_BTN_IN_ISR and the button in the WDT while the code for WDT is not present. It work, for rotary action to roll and react to the direction, button from "CONF" and "BACK" will respond but only them. 
 
+### Different Pin configuration
+As we had totally get rid of the button algorithm using attachInterrupt(), we can make it free for something else. This schema suggest now the rotary button switch will move from previous schema from Pin 3 to Pin 7 and with uses of arrayBuilderProperty and default value issue inside the code belong to the SW_ENCDR Pin name inside the Arduino code show some #define directive possible to change the pin name. Let see the code:
 
+**editor** file: ST7735RotaryBtnEx.ino
+
+    #if !defined( SW_ENCDR_PIN )
+	#define SW_ENCDR                    3
+	#else
+	#define SW_ENCDR                    SW_ENCDR_PIN
+	#endif
+
+  Found at the beginning of the Arduino Code, This show a default value of '3', the Pin reference name. Using the #define SW_ENCDR_PIN=7 to change the compilation information using arrayBuilderProperty .
+
+From the original version of .BuildProperty from this repository do this command line.
+
+**bash**
+
+	declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+    for item in ${ArrayKey[@]} do 
+        ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR -DSW_ENCDR_PIN=7" arrayBuildProperty ; 
+    done
+recompile:
+
+**bash**
+
+    arduino-compile
+
+And flash the build version inside the LGT8F328 chip and this will work too. But warning, to only change the Pin assignation and not telling to remove the attachInterrupt() with the define compilation "-DNO_BTN_IN_ISR" let try to attach PC INT interrupt to a different Pin than 2 or 3 which is not possible it only check these two Pin. The define option "-DBTN_IN_WDT" might be not used an will work too assigning to Pin 7. In extra you can try yourself Using Pin 12, Pin 22 SW or Pin 23 SWD they should work too. Apparently the Analog pin can support the INPUT_PULLUP situation and might work, but exclude pin A4 and A5 they are used for I2C and may not work directly as Analog Pin and either as digital pin running to several frequency. 
+
+![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/schema_ST7735RotaryBtnEx_Pin7.png)
+
+## Alternative
+Here the alternative section. using the default model from this repository, flashing this chip with the file ST7735RotaryBtnEx.ino.hex and instead of using the normal encoder, using the KY-040 or the Keyes rotary encoder does require to get a level voltage translator. Here the cheap and good one should be enough. The 4 transistors with 4 x 10 kilo Ohm resistors will be enough.  If you canget an 8 bridged level voltage translator you can put the 2 button on the level bridge number 4 and 5 and connect the button to 5V instead and Put LV4 and LV5 to Pin 5 and Pin 6 and change the resistor for 4.7 Kilo Ohms by 10 Kilo Ohms and all your entry will be on 5V. Here only the KY-040 rotary encoder and the internal button switch is 5V based.  
+
+
+![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/ST7735BtnEx_2ndTypeRotr.png)
