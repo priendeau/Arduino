@@ -30,7 +30,7 @@ The second image appear when you push the rotary itself and at the left of title
  
 
 ## Arduino Schema to follow:
-In this activity we will offer a 2 kind of connection for button as it's also possible to remove an interrupt over PIN 3 which is use KEY connection from the rotary and uses attachInterrupt() from arduino core to bind a function switchInterrupt() which can barely replaced by function buttonPressed(). This will be covered later.
+In this activity we will offer a 2 kind of connection for button as it's also possible to remove an interrupt over PIN 3 which is use KEY connection from the rotary and uses attachInterrupt() from Arduino core to bind a function switchInterrupt() which can barely replaced by function buttonPressed(). This will be covered later.
 
 In this activity we will also offer an alternative using switch compilation to transfer all the button press activity into an Watchdog offer by dbuezas core involving coding insede the ISR (WDT_vect) function. We will also see if 256 millisecond is enough for triggering button.
 
@@ -49,7 +49,7 @@ While arduino-cli is officially used by Arduino IDE it tend to leave the IDE con
 
 ## Arduino Client installation.
 
-Here a famous line for the installation of arduino client and it's acessible by openning a shell prompt from your Gnome/Cinnamon/Mate/KDE/Xwindows desktop.
+Here a famous line for the installation of Arduino client and it's accessible by opening a shell prompt from your Gnome/Cinnamon/Mate/KDE/Xwindows desktop.
 
 **bash**
 
@@ -124,7 +124,7 @@ With arduino-cli do this following command :
 
     arduino-cli core install "lgt8fx:avr@2.0.7"
 
-And should install the latest dbuezas core for LGT8F328 for Wemos TTGO-IX, LGT8f328-QFN32, LGT8f328-QFN48 and LGT8f328-SSOP20 where the SSOP20 is equivalent to arduino pro-micro and having 12 less pin than Wemos TTGO-IX, LGT8f328-QFN32, but still operate at 32Mhz. 
+And should install the latest dbuezas core for LGT8F328 for Wemos TTGO-IX, LGT8f328-QFN32, LGT8f328-QFN48 and LGT8f328-SSOP20 where the SSOP20 is equivalent to Arduino pro-micro and having 12 less pin than Wemos TTGO-IX, LGT8f328-QFN32, but still operate at 32Mhz. 
 
 Once the arduino-cli finish its installation you can verify what you have installed with this command:
 
@@ -275,7 +275,10 @@ As activity, adding the compilation switch DEBUG_USB_SERIAL to see an ouput.
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done 
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
+    for item in ${ArrayKey[@]} ; do 
+      ACTION=ADD KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
+    done 
 Or:
 
     ACTION=ADD KEY=compiler.c.extra_flags VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty
@@ -285,7 +288,10 @@ Deleting the DEBUG_USB_SERIAL:
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
+    for item in ${ArrayKey[@]} ; do 
+      ACTION=DEL KEY=${item} VALUE="-DDEBUG_USB_SERIAL" arrayBuildProperty 
+    done
 This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Beware if you only put :
 
     ACTION=DEL KEY=${item} arrayBuildProperty
@@ -319,7 +325,10 @@ So to fully use the Watchdog ISR function and detach the button from the rotary 
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
+    for item in ${ArrayKey[@]} ; do 
+      ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
+    done
 
 and recompile:
 
@@ -345,7 +354,10 @@ and recompile:
 ### Looking at the initial definition:
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) ; for item in ${ArrayKey[@]} ; do ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; done
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
+    for item in ${ArrayKey[@]} ; do 
+      ACTION=DEL KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty 
+    done
 
 recompile:
 
@@ -372,7 +384,7 @@ Ok it remove 24 bytes but merely rewritten few line and trowed out an attachInte
 
 **bash**
 
-    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+    declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
     for item in ${ArrayKey[@]} do 
         ACTION=DEL KEY=${item} VALUE="-DWATCHDOG_ISR_WAIT_TIME=WTOH_256MS -DWITH_WDT_LGT8F -DBTN_IN_WDT -DNO_BTN_IN_ISR" arrayBuildProperty ; 
     done
@@ -420,9 +432,9 @@ From the original version of .BuildProperty from this repository do this command
 
 **bash**
 
-	declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags) 
+	declare -a ArrayKey=( compiler.c.extra_flags compiler.cpp.extra_flags ) 
     for item in ${ArrayKey[@]} do 
-        ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR -DSW_ENCDR_PIN=7" arrayBuildProperty ; 
+      ACTION=ADD KEY=${item} VALUE="-DBTN_IN_WDT -DNO_BTN_IN_ISR -DSW_ENCDR_PIN=7" arrayBuildProperty ; 
     done
 recompile:
 
