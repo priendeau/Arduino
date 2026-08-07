@@ -1,12 +1,27 @@
 ## Application ST7735RotaryBtnEx.ino
 
-## What is a Rotary Switch.
+This application is a top template for the micro-controller LGT8F328. Offering an LCD SPI interface to show information where USB Serial with Serial.print(...) lack or make the micro-controller spontaneous rebooting of stalling, it offer a small footprint and an easy way to drive a rotary switch position with a button on top an control two other button. The choice of using an LCD SPI interface come from a bug with I2C using the communication algorithm offer with dbuezas core and Arduino core to know to be onReceive and onRequest function seems to not working using I2C interface for LCD and the communication channel too. So I design an SPI version that might be well explained and working here before generating the I2C communication function.
+
+Table of content:
+
+ 1. What is a Rotary Switch.
+ 2. Description of the activity.
+ 3. Bill of Material.
+ 4. Arduino Schema to follow.
+ 5. Tool required.
+ 6. Arduino Client installation.
+ 7. Avrdude software installation.
+ 8. Compilation with arduino-compile & arrayBuildProperty.
+ 9. Compilation Switches example.
+ 10.Alternative. 
+
+## 1. What is a Rotary Switch.
 
 ![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/rotary_encoder_ec11_pinout-small.png)
 
 Rotary Switch are infinite roll action giving possibility to never block the rolling action. As example a volume roll does depend of the internal resistance and somewhat using variable resistance. A rotary does only report in a form of quadrature encoding if it clench between a position to another and through Pin S1/S2 it held information if the rotary is moving in clock direction or counter clock direction. Difference between S1 and S2 is S2 is 90 degree shift phase and will not report an LOW statement immediately it's S1 that perform an instant switch. While S2 take a fraction of turn it inform the micro-controller is going in the clock rotation direction or counter clock direction. 
 
-## Description of the activity.
+## 2. Description of the activity.
 As the schema still in drawing, the actual demonstration here imply 2 images that appear on the color LCD. An arrow apparently green show the direction of the rotary movement. The Triangle arrow point to the right when we increase the turn and show the triangle pin to the left when it's time to turn the rotary switch counter clock. The code allow to move from 0 to 99 and once at 0 you can't rewind and fall at 99. It's the same for the increasing you can't fall to 0 after reaching 99.
 The second image appear when you push the rotary itself and at the left of title "ENCDR" an green circle will be drawn from small to bigger and look like to a blinking will appear once you push the rotary button. The rotary switch is also a button. Other button at the left will also blink at the screen when you push one of the 2 buttons. You can't push them all in the same it's the first that respond and at 32Mhz it's still fast enough to not report them all pushed. So by pushing the button it blink for "CONF" or "BACK".
 
@@ -14,7 +29,7 @@ The second image appear when you push the rotary itself and at the left of title
 ### In the middle of the image, here the main Rotary Encoder
 
 
-## Bill of Material:
+## 3. Bill of Material.
 
 |     Name      | Quantity |                  Component                      |
 |---------------|----------|-------------------------------------------------|
@@ -29,10 +44,10 @@ The second image appear when you push the rotary itself and at the left of title
 
  
 
-## Arduino Schema to follow:
+## 4. Arduino Schema to follow.
 In this activity we will offer a 2 kind of connection for button as it's also possible to remove an interrupt over PIN 3 which is use KEY connection from the rotary and uses attachInterrupt() from Arduino core to bind a function switchInterrupt() which can barely replaced by function buttonPressed(). This will be covered later.
 
-In this activity we will also offer an alternative using switch compilation to transfer all the button press activity into an Watchdog offer by dbuezas core involving coding insede the ISR (WDT_vect) function. We will also see if 256 millisecond is enough for triggering button.
+In this activity we will also offer an alternative using switch compilation to transfer all the button press activity into an Watchdog offer by dbuezas core involving coding inside the ISR (WDT_vect) function. We will also see if 256 millisecond is enough for triggering button.
 
 ### This is the first method as demonstration 
 Here the connection for the following activity.
@@ -42,12 +57,12 @@ Note: The LGT8F328 in the middle of the image have a top pinout totally compatib
 
 Don't forget to put the power ! It use the default FTDI Vcc/Ground pin to allow feeding the design but it's strongly recommended to use battery, USB connector, breadboard power supply like the breadboard image on the left show a default dual 3V3 and 5V powering from AMS1117 and connection from 12volts to 3v3/5v or using the USB and source.
 
-## Tool required 
-In this activity we will entirely depend of the arduino-cli and bash command from Linux. I will give the required step to install the arduino-cli. Inside this repository you do have some file used to enhance the use of arduino-cli and I invite to use them by giving all the help it's required. 
+## 5. Tool required.
+In this activity we will entirely depend of the arduino-cli and bash command from Linux. I will give the required step to install the arduino-cli. Inside this repository you do have some file used to enhance the use of arduino-cli and I invite to use them by giving all the help it's required. Flashing the hexadecimal build binary over a micro-controller do require a physical USB to TTL interface such as CH340 or FTDI-232. In this activity we will use the FTDI-232 and a software called avrdude. Avrdude software is a free tool and work in several Linux distribution as well Windows, and OSX. The website or repository offer an already build application ready to use for several platform as mentioned. Therefore if you have already install Arduino IDE you'll find an already working version of avrdude if you have installed other core.
 
 While arduino-cli is officially used by Arduino IDE it tend to leave the IDE consuming time and beautiful environment where few widget still here inside the IDE to make it appealing. One of them is accessing to function name and declaration inside a library. Yes it offer to wound around your code and especially good to see all element declared and help your getting them. As impressive the u8g2 library offer alternative to many LCD to get connect and work with Arduino to get the declaration example is often through example but clicking to a good declaration in your code from Arduino IDE will push opening the file holding your declaration and can see different alternative. We will not give example in this way because even example can be extracted from arduino-cli. 
 
-## Arduino Client installation.
+## 6. Arduino Client installation.
 
 Here a famous line for the installation of Arduino client and it's accessible by opening a shell prompt from your Gnome/Cinnamon/Mate/KDE/Xwindows desktop.
 
@@ -89,10 +104,10 @@ A default command is also good to perform and this one is also store inside alia
 
 Note: Once arduino-cli is installed you can output all information in text which is by default. Outputting them into JSON and recover the content from python interpreter is a good thing to do if you want to keep the information and still be visual to seek for information. Few space in this repository does offer alternative to manage arduino-cli as visual interface using tkinter which is not demonstrated here but possible to use to enjoy and let your system suffer less from memory exhaustion because Arduino IDE is relatively huge and consume a lot of memory to perform an imitation on Intelli-Sense(1) accessing to your code with bubble and windows.
 
-## What is holding your configuration file for arduino-cli ?
+### What is holding your configuration file for arduino-cli ?
 Everything inside the configuration file is written in a YAML format. It does not hold symbols in form of <element>value</element> like XML but own a specific text validation when it's time to add several's line like the core element require a '-' dash at every line. As example here the installation of dbuezas core should require your arduino-cli to work with a switch parameter if you haven't add yourself the dbuezas core with Arduino IDE you can point your Arduino IDE configuration by arduino-cli as long you know where is the path. Usually it stand around "/${HOME}/.arduinoIDE/arduino-cli.yaml" Where ${HOME} is your default Linux user home. 
 
-## An exception
+### An exception
 Bad news, installing only the dbuezas core does not include installing the flash tools to flash. It uses ftdi-232 and avrdude as software to enable Arduino communicating. Installing Arduino IDE can solve yourself to find a compatible avrdude configuration or start looking to installing independently avrdude version 8.0 at least. Or even installing a core that do install the avrdude. Arduino, MegaCoreX, MiniCore  fit the most in the well installed and optimized avrdude version. Installing Arduino core also offer a avrdude version 6.3 tuned for CH340 serial communication gateway, as ftdi-232 is an all compatible too. In this case there is a demonstration of avrdude by the shell because this activity export the binary and let make it available for flashing.
 
 ### Long-long way to use arduino-cli 
@@ -110,7 +125,7 @@ You made the config init and using the aliasrc left in this repository. User wit
     board_manager:
 	    additional_urls:
 
-You add :
+under "additional_urls:" you add :
 
     - https://raw.githubusercontent.com/dbuezas/lgt8fx/master/package_lgt8fx_index.json
 
@@ -147,7 +162,70 @@ And fall with a text list that may look like this :
 
 And you can see at the end "**lgt8fx:avr**" is installed. 
 
-## Compilation with arduino-compile & arrayBuildProperty
+## 7. Avrdude software installation.
+
+Visiting Avrdude repository of the version 8.0 you won't have any problem using it for several Arduino core. This application is a top software solution to alternatively send any type of binary and fuse configuration to a micro-controller. This activity is not covering fuse configuration and chip like LGT8F328 are already "*fused*"  to work and it stand by sending the arduino-core by flashing at it if it come without. It's not covered by this activity. You can visit wolles-elektronikkiste.de at this address https://wolles-elektronikkiste.de/en/lgt8f328p-lqfp32-boards, to get any specificity including flashing an arduino-core if you wipe-it with a general overwrite command. It's a German website available in English.   
+
+Let's visit the Avrdude website at : https://github.com/avrdudes/avrdude/releases#release-v8.0 
+
+![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/avrdude_github_assets.png)
+
+Go at the end of the 8.0 release list and select the arrow at the left of the "**Assets**". For all the release of avrdude you found inside the name, the version, and the platform required for you. As example, I do compile everything on an Intel Xeon-E5-2650v4 and this under linux. But I am working remotely through my local area network and access remotely and do ssh command to call arduino-cli or use it via VNC. But every build is exported with NFS onto the Raspberry Pi 4 I use. So In fact I do not need to install avrdude for Xeon which suppose to be a Linux_64bit. I do use Linux_ARM64 version because my desktop and my table for crafting is far from the Xeon and make the USB wire an 80 cm USB with mini-connector. As user of CH340 will require shorter USB cable to communicate. Unless you are not using the FTD-232 chip to send your binary to the micro-controller it's strongly recommended to use a shorter cable it's a 15 cm suggested long cable. So take your time to shop an FTDI-232 chip and 30 cm of cable will be good. But in doubt use an shorter one.  
+
+With the downloaded version you extract avrdude and avrdude.conf they are both important. Usually you will also have to install them into accessible Linux location like /usr/local/bin. You can copy both into /usr/local/bin or keeping the avrdude.conf either in the /etc in your /home, but it's more important to know where the configuration is to call avrdude it always require the configuration file and without checking if you already have an old version of avrdude It will refer to the already installed configuration. So here the installation for Linux Arm64 as example:
+
+**bash**
+
+    tar xvzCf avrdude_v8.0_Linux_ARM64.tar.gz ./
+    cp avrdude avrdude.conf /usr/local/bin 
+
+If your /usr/local/bin path is in the general ${PATH} variable it's seemless you can call your avrdude always starting it like:
+
+**bash**
+
+    avrdude -C /usr/local/bin/avrdude.conf ...
+
+### General form calling avrdude.
+
+Here a general form where if you answer to all the question the avrdude command will work well.
+
+**bash**
+
+    __APP__ -C __APP_CONF__ -v -V -patmega328p -carduino -P __USB_DEV__ -b __BAUD__ -D -U flash:w:__BINARY__:i
+
+where:
+|        TAG          | It's meaning                                                        |
+|---------------------|---------------------------------------------------------------------|
+|     __APP__         |   avrdude                                                           |
+|   __APP_CONF__      |   configuration file ?                                              |
+|    __USB_DEV__      |   Over what you have connect it                                     |
+|     __BAUD__        |   57600                                                             |
+|    __BINARY__       |   The build binary in form .hex (especially the biggest of the two) |
+|                     |                                                                     |
+ 
+ As __USB_DEV__ is over where you connect. Most of Linux User using an Raspberry Pi will host and USB bar to extend the number of USB plug, but FTDI-232 user will see the TTL to USB device under /dev/ttyACM0, CH340 User will see the device under /dev/USB0, /dev/USB1. Windows user to have COM port and will sometime refer to install the FTDI-232 driver or CH340-SER driver which is not cover here actually. OSX user will vary but look like /dev/cua... 
+
+As __BINARY__ represent the binary name file it must include the whole path location and the file. As user using arduino-compile and arrayBuildProperty in this activity  using view_BuildProperty will show you a key name "--output-dir" based on .BuildProperty file from this repository the key "--output-dir" show a value of "build/lgt8fx.avr.328" where from your git-clone seance you might have directory name build/lgt8fx.avr.328 where two hexadecimal are present if arduino-compile was used for this activity you should see :
+
+**bash**
+
+    ls build/lgt8fx.avr.328/
+
+**output**
+
+    -rw-rw-r-- 1 maxiste maxiste     13 Aug  4 18:16 ST7735RotaryBtnEx.ino.eep
+	-rw-rw-r-- 1 maxiste maxiste   2812 Aug  4 18:16 ST7735RotaryBtnEx.ino.with_bootloader.hex
+	-rw-r--r-- 1 maxiste maxiste  30720 Aug  4 18:16 ST7735RotaryBtnEx.ino.with_bootloader.bin
+	-rw-rw-r-- 1 maxiste maxiste  46642 Aug  4 18:16 ST7735RotaryBtnEx.ino.hex
+	-rwxrwxr-x 1 maxiste maxiste 124736 Aug  4 18:16 ST7735RotaryBtnEx.ino.elf
+
+ You see "ST7735RotaryBtnEx.ino.with_bootloader.hex" which is a small file and ST7735RotaryBtnEx.ino.hex which is bigger, you should take this one not the first. Everything inside is converted from binary to Intel Hexadecimal sheet which is small line with a checksum and only avrdude can read or any Intel Hexadecimal format. 
+
+Remark. The file is bigger than 16K or so show while compiling with arduino-compile is it normal ? Absolutely as big the file is in text mode and is filled from the binary segment and a checksum at every segment. Avrdude is pretty checking all the line to ensure they have no error transfer through the Intel Hexadecimal protocol and send it to the micro-controller. The file "ST7735RotaryBtnEx.ino.elf" left in is Unix like format is available to do objdump and linking it to your code letting you see the assembly code with your Arduino file. It's not covered up but it's genuine programmatic tool reserved to inspect the code and it's opacity.  
+
+Future effort will introduce a bash function to help flashing. 
+
+## 8. Compilation with arduino-compile & arrayBuildProperty.
 First let do a shell operation because the main arrayBuildProperty read hidden file and this repository does not support to store hidden file:
 
 **bash**
@@ -298,7 +376,7 @@ This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Bewar
    This will erase the whole ${item} as key Defined into a enumeration of the key by using an inline array declaration it will suppress both key compiler.c.extra_flags and compiler.cpp.extra_flags, so beware, or load it again and only save when the test are done.
 
 
-## Compilation Switches example.
+## 9. Compilation Switches example.
 In this activity the micro-controller and the rotary switch and buttons including the rotary switch button may run in severals way and #define clause were developed to show characteristic of the dbuezas core and the original coding for arduino-core and how to change some elements. The definition as changing some elements can be the KEY of the rotary switch and where on the micro-controller it going to be associated. The other characteristic of the activity are moving where the button answer are treated, as speed response from changing the Watchdog respond time. And finally comparaison of using some switch. Using the exclusion of the Watchdog does weight in the balance but personally it's a good deal as alternative to attachInterrupt() to use the Watchdog function vector interrupt seems to be seamless.  
 
 As you can use an alias to view the concurrent Array with arrayBuildProperty, be sure you start with the repository version or .BuildProperty :
@@ -446,7 +524,7 @@ And flash the build version inside the LGT8F328 chip and this will work too. But
 
 ![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/ST7735RotaryBtnEx/schema_ST7735RotaryBtnEx_Pin7.png)
 
-## Alternative
+## 10. Alternative.
 Here the alternative section. using the default model from this repository, flashing this chip with the file ST7735RotaryBtnEx.ino.hex and instead of using the normal encoder, using the KY-040 or the Keyes rotary encoder does require to get a level voltage translator. Here the cheap and good one should be enough. The 4 transistors with 4 x 10 kilo Ohm resistors will be enough.  If you canget an 8 bridged level voltage translator you can put the 2 button on the level bridge number 4 and 5 and connect the button to 5V instead and Put LV4 and LV5 to Pin 5 and Pin 6 and change the resistor for 4.7 Kilo Ohms by 10 Kilo Ohms and all your entry will be on 5V. Here only the KY-040 rotary encoder and the internal button switch is 5V based.  
 
 
