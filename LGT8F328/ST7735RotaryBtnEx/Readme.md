@@ -203,7 +203,7 @@ where:
 |    __BINARY__       |   The build binary in form .hex (especially the biggest of the two) |
 |                     |                                                                     |
  
- As __USB_DEV__ is over where you connect. Most of Linux User using an Raspberry Pi will host and USB bar to extend the number of USB plug, but FTDI-232 user will see the TTL to USB device under /dev/ttyACM0, CH340 User will see the device under /dev/USB0, /dev/USB1. Windows user to have COM port and will sometime refer to install the FTDI-232 driver or CH340-SER driver which is not cover here actually. OSX user will vary but look like /dev/cua... 
+ As __USB_DEV__ is over where you connect. Most of Linux User using an Raspberry Pi will host and USB bar to extend the number of USB plug, but FTDI-232 user will see the TTL to USB device under /dev/ttyACM0 or /dev/ttyUSB0, /dev/ttyUSB1, CH340, and Holtek user will see the device under /dev/USB0, /dev/USB1. Windows user to have COM port and will sometime refer to install the FTDI-232 driver or CH340-SER driver which is not cover here actually. OSX user will vary but look like /dev/cua... 
 
 As __BINARY__ represent the binary name file it must include the whole path location and the file. As user using arduino-compile and arrayBuildProperty in this activity  using view_BuildProperty will show you a key name "--output-dir" based on .BuildProperty file from this repository the key "--output-dir" show a value of "build/lgt8fx.avr.328" where from your git-clone seance you might have directory name build/lgt8fx.avr.328 where two hexadecimal are present if arduino-compile was used for this activity you should see :
 
