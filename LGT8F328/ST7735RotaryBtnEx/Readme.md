@@ -279,7 +279,7 @@ How many core you have :
 
     grep "cpu cores" /proc/cpuinfo | head -n1 | cut -d: -f 2
 
-Following the number you have let spilt in 2 : 
+Following the number you have let split in 2 : 
 
 **bash**
 
@@ -290,7 +290,7 @@ or simply edit Arduino.sh and inside the function arduino-compile change the lin
 
     local IntJobP=${ACJobs:=12} ;
 
-By the number the grep give you. Exceptionally for Pentium III and IV you may have between number 1 and 2 for Pentium III if it's in dual. Same thing for Amd x86_64 it start at 2 with Atlhon, Rizen up to 10, using Arm like raspberry pi 4 or 5, between 4 and 8, and so on.
+By the number the grep give you. Exceptionally for Pentium III and IV you may have between number 1 and 2 for Pentium III if it's in dual. Same thing for AMD x86_64 it start at 2 with Atlhon, Ryzen up to 10, using Arm like raspberry pi 4 or 5, between 4 and 8, and so on.
 
 If you change the Arduino.sh, don't forget to load it back it's the same as chapter "Compilation with arduino-compile & arrayBuildProperty". 
 
@@ -377,7 +377,7 @@ This will remove DEBUG_USB_SERIAL and leave the Array with all the switch. Bewar
 
 
 ## 9. Compilation Switches example.
-In this activity the micro-controller and the rotary switch and buttons including the rotary switch button may run in severals way and #define clause were developed to show characteristic of the dbuezas core and the original coding for arduino-core and how to change some elements. The definition as changing some elements can be the KEY of the rotary switch and where on the micro-controller it going to be associated. The other characteristic of the activity are moving where the button answer are treated, as speed response from changing the Watchdog respond time. And finally comparaison of using some switch. Using the exclusion of the Watchdog does weight in the balance but personally it's a good deal as alternative to attachInterrupt() to use the Watchdog function vector interrupt seems to be seamless.  
+In this activity the micro-controller and the rotary switch and buttons including the rotary switch button may run in several way and #define clause were developed to show characteristic of the dbuezas core and the original coding for arduino-core and how to change some elements. The definition as changing some elements can be the KEY of the rotary switch and where on the micro-controller it going to be associated. The other characteristic of the activity are moving where the button answer are treated, as speed response from changing the Watchdog respond time. And finally comparison of using some switch. Using the exclusion of the Watchdog does weight in the balance but personally it's a good deal as alternative to attachInterrupt() to use the Watchdog function vector interrupt seems to be seamless.  
 
 As you can use an alias to view the concurrent Array with arrayBuildProperty, be sure you start with the repository version or .BuildProperty :
 
