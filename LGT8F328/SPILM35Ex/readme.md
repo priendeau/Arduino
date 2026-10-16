@@ -1,0 +1,171 @@
+## Application SPILM35Ex.ino
+
+l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliqué le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de test. Et ayant ajouté plusieurs commodité à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de capaciteur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO, ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
+
+
+Table des matières :
+
+ 1. Le LM35 et sa condition.
+ 2. Description de l'activité.
+ 3. Liste du matériel.
+ 4. Plan de construction Arduino à Suivre.
+ 5. Outils nécessaire pour la réalisation de l'application.
+ 6. 
+ 7. 
+ 8. 
+ 9. 
+ 10. 
+
+## 1. Le LM35 et sa condition.
+
+Ici, vous voyez 2 LM35DZ côte à côte pincé par une simple pince qui colle l'étiquette de définition d'une puce en format TO-92. Alors face à face sur un fil de 10 cm en dehors d'une planche à pain à donné de très mauvais résultat lorsqu'ils ont trempés dans la glace et ne point descendre de quelques dégrée Celsius. De plus dans une condition inverse de le tenir près d'une flamme de bougie et dans la cire fondu n'ont pas vraiment changé les résultats. À quoi sert le LM35 ? 
+
+![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_dual-lm35_small.png)
+
+Une fois le diagramme interne inspecté il n'y a que la présence d'une de deux transistors et une ligne de sortie qui garantie via une mini-monitorage de l\u2019ampérage garantisse la sortie à 8.8mV/Celsius et une autre comparateur qui garantie d'élevé la tension à 10mV/Celsius. Alors il s'agit d'un convoyeur d'énergie qui garantie que dans le cas de un transistor 10 fois plus puissant que le transistor de base à eux deux garantissent une sortie final à 10mV/Celsius. Nous parlons ici d'une analyse de flux électrique qui dépend des facteurs extérieur et pratique une compensation avec les comparateurs A1 et A2. De plus il y a une implémentation de pont de résistance Wheatstone entre la série nR1 et ( .125 R2 + R2 ) qui égalise la différence pour calibrer la sortie.   
+
+![À gauche, Specification LM35 à l'intérieur, À droite, pont Wheatstone](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/LM35_Internal_schema.png)
+Ici dans le diagramme il y à gauche le schéma interne du LM35 et à droite le pont Wheatstone qui fait office de comparaison pour obtenir la vrai valeur en Ohm de Rx est par l'analyse du courant qui passe entre le pont de division A - ( pont de division C ) où R2 est variable pour l'atteinte de la moitié du voltage et connaître la valeur de Rx.  
+
+
+## 2. Description de l'activité.
+L'activité à pour but de qualifié si vous cherchez de prendre la température via une sonde ou une prise générale de la température. Vous pouvez passez à travers une grande quantité de LM35DZ, les 5 spécimens testé donne des résultats plus haut que prévue, mais quelque fois donne vraiment la bonne température. Les conditions lors de l'écriture de l'activité était en automne et les journées froides et sombres sont plus fidèle de reflété une température au thermostat et les journées humide et ensoleillés ont donnés des résultats élevés. Cependant entre la section ombragé de la maison et la section sous-sols donne des résultats élevés et pourtant le solarium ou il devrait faire la température indiqué sur l'écran semble valide, mais n'a pas changé de son démarrage dans le sous-sol. Alors les conditions internes sont absolument géré par la présence du soleil et l'énergie total disponible dans environnement sous ensoleillement. Il va de pair que la méthodologie à l'intérieur du LM35 ne fait qu'un calcul de d\u2019évidement entre un gros transistor 10x plus puissant que celui qui récrimine et réalimente la valeur de base à 1.38 volts (voir le schéma LM35). 
+
+### Domaine d'hypothèse. 
+Comparé avec une recharge sans-fil appelé par induction certaines montre moderne nécessite une recharge par induction et sont extrêmement chaude suite à l'induction du voltage et le capteur de voltage. Descendre la chaleur résiduelle pour éviter que la montre soit brûlante, implique que le chargeur devrait être équipé d'un évaluateur de passage d'énergie et entre dans le domaine du LM35. Travaillant avec le phénomène de charge et d'impulsion une charge rapide impliquerait aussi d'injecté à plus haute fréquence l'impulsion et génèrerait plus de courant en passage. Le LM35 conditionnerait l'empêchement d'atteindre des valeurs qui brûle l'utilisateur ou de faire fondre le plastique de la montre.
+  
+
+Le LM35DZ, celui qui ne dépend pas de la calibration du voltage de Vout et Gnd (appellé LM35) qui donne en autre des valeurs en Kelvin. le LM35DZ se connecte à 4 Volts et supporte une tension au plus de 30V. La sortie sortie étant unilatéralement entre 55mV à -55 et de 1.00 Volt à 100 Dégrée Celsius peut être connecté à un microcontrôleur opérant à 5V ou 3V3, mais ne peut fonctionné avec le voltage du 3V3, rapporte encore plus de différence avec un microcontrôleur 3V3. L'astuce est de garantir un voltage d'au moins 4 volts. Il n'y a pas que le LM35DZ qui demande des contraintes similaires. Le DHT11, AMT22 sont aussi avec le même régime d'alimentation qui est au moins 4Volts. 
+
+L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un   
+
+![La planche à pain avec l'écran](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-3.png)
+
+### Description de l'image
+Ici dans l'image de "La planche à pain avec l'écran", il y a au centre l'écran SPI ST7735 à 80x160 qui marche à l'envers, il y la fonction spécial qui prévoit économisé une Pin de sur le microcontrôleur et utilise conjointement la Pin "Res" sur l'écran est connecté sur le Reset du microcontrôleur. En arrière de l'écran il y a la partie pont de division de courant à base de 2 résistance et de deux condensateur. À gauche du pont principal il y a les deux LM35DZ cadencé avec un transistor ici non visible à cause de la pair de fils violet-bleu-vert vous ne pouvez voir que la résistance de 470 Ohms en dessous de la pair de fils.  À droite totalement sur la planche à pain, la barre d'alimentation avec les ams1117 en format 3V3 et 5V. Le tout est relié à un paquet de batterie 18650 qui sont convertis en alimentation compatible USB ou un 5V. Il va de même que l'alimentation jusqu'à 12V est inclus et donne le même résultats sinon un plus grand décalage à cause qu'il y a plus de stress pour convertir la tension en 3V3 et 5V. Noté que le rail du haut ou jonction de courant du haut est à 5V et celle du bas à 3V3. le microcontrôleur LGT8F328 supporte le 3V3 comme le 5V. Le cas échéant nôtre microcontrôleur est un 3V3 et ne peut alimenté directement les LM35DZ. De plus dans l'application la dernière ligne avec le Vref ou il est indiqu 5147mV correspond à une approximation avec le résultat du premier pont monitoré avec la branche A0.  
+ 
+### Précaution à prendre pour la substitution d'un transistor NPN.
+Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalent et est disponible chez Addisson Électronique, ou en ligne dans un centre de détail. Aliexpress offrent de plus en plus des transistor de type US, mais inclus librement les transistor Internationaux ou Chinois tel le BC337. Il y a une petite différence. Tous les deux partagent la base sur la pin numéro 2, mais le Collecteur et l'Émetteur sont inversé dans le cas du BC337 donc lorsqu'il mentionné de connecté l'Émetteur à la base pour le 2n2222 il s'agit de la pin 1 à la gauche lorsque le transistor affiche la face plate vers vous et dans le cas du BC337, BC547, BC548, BC549, BC550, la pin Émetteur est la dernière à droite. Pour substitué le 2n2222 vous pouvez le remplacé par le 2n4401 qui est aussi NPN. Le schéma présenté pour connecté le LM35DZ à un transistor NPN est différent d'un schéma PNP puisque la définition du NPN est de bloqué la base du courant pour y laisser fuir ( phénomène d'écoulement ou "Sinking" ) l'électricité vers l'émetteur qui va vers la base ou "Ground" en anglais.
+
+![À gauche le transistor 2n2222. À droite le transistor BC337](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/2N2222-Pinout.jpg)
+
+
+## 3. Liste du matériel.
+
+|     Nom       | Quantité |           Description des éléments              |        
+|---------------|----------|-------------------------------------------------|
+|    U1         |    1     | LGT8F328 QFN32                                  |
+|    U2         |    1     | ST7735 80x160 pixel 65k/282k couleur            |
+|    U3         |    2     | LM35DZ                                          |
+|    U4         |    1     | FTDI-232 USB/TTL loadeur                        |
+|    T1         |    1     | 2n2222 NPN transistor ou le BC337               |
+|    C1         |    1     | 470 uF, 6.3 V Capaciteur polarisé               |
+|    C2-C3      |    2     | 100 uF 6.3-25 V Capaciteur polarisé             |
+|    R1-R3      |    3     | 1 k\u2126 Résistance                            |
+|    R3-R4      |    2     | 4k7 \u2126 Résistance                           |
+|    R4-R5      |    2     | 10 ou 20 k\u2126 Résistance                     |
+|    R6         | 1 ou 3   | 470 \u2126 Résistance                           |
+|    P1         | 1 ou 0   | Planche à pain avec rail (facultative)          |
+|    D1         | 1 ou 0   | Dérive de courant à 3V3 et 5V.                  |
+
+ 
+
+## 4. Plan de construction Arduino à Suivre.
+
+
+### représentation du schéma
+
+![](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_main_circuit.png)Reference: https://app.cirkitdesigner.com/project/517cf01c-8466-4958-a5d0-4e3969cfa1ed
+
+
+## 5. Outils nécessaire pour la réalisation de l'application.
+
+Vous pouvez re-visitez la branche de mon github.com Arduino/LGT8F328/ST7735RotaryBtnEx pour les explications d'installation de arduino-cli, de la fonction arrayBuilder et arduino-compile. Ici il n'y a que l'ajout visuel du arrayBuilder permettant la visualisation avec zenity disponible sous Linux et quelques distribution compatible Posix/Unix, mais zenity étant grandement disponible dans plusieurs distribution Linux, Windows pourrait supporté zenity à travers Mingw32/64 et Msys qui semble toujours disponible pour Windows 11. Cependant Linux est fortement conseillé et OSX reste plus ou moins viable, mais à tous terminal bash disponible il est possible de continuer. 
+
+Ils y a quelques outils non mentionnés qui reste indispensable à la vérification de vôtre montage et vérification de certains pré-requis. 
+
+Adaptateur prérequis pour envoyer du code binaire au microcontrôleur 
+![FTDI2232 USB/TTL convertisseur ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/ftdi_232.png)
+
+Paquet de batterie avec support USB. Cette version cheap acquis sur AliExpress est correct. Offre une entrée de charge en USB micro et type-C. Offrent 2 sortie USB-A, utilise 3 batteries 18650. Cependant les 3 batteries en main sont des 10000mAh et la charge interne à ce paquet n'est pas fidèle à la recharge. L'avantage de petites lumières sur le dessus pour éclairé vos montage dans le noir si vous avez peu de lumière sur vôtre place de montage favoris. 
+![paquet de batterie rechargeable, USB](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/batterie_pack.png)
+
+Un multimètre. Indispensable. Le pont de division de voltage pour chacun  des LM35DZ doit être de 4.0 volts. La configuration présenté sur le schéma est de 1.00 Kilo Ohms et  4.7 Kilo Ohms sur une base de 5 volts. 
+Le calcul est Vout = (Vs * R2)/( R1 + R2 ) ou:
+| Symbole| Définition        |
+|--------|-------------------|
+|Vout    | Voltage sortant   |
+|Vs      | Voltage source    |
+|R1      | Résistance 1      |
+|R2      | Résistance 1      |
+
+La réponse pour le groupe 2 et 3 du pont de division de voltage devrait doné 4.123 volts, cependant au multimètre ça indiquait 4.0 Volts et quelque fois 4.1, mais pas en dessous de 4.0 volts.       
+![Multimètre ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/multimeter.png)
+ 
+ ### Logiciel à utiliser
+ Le logiciel en mode text ou terminal du type arduino-cli est important. Dans la version développé ici est conçu pour utiliser une table de #define qui ont tous une valeur par défaut. En utilisant l'application arrayBuilder en mode graphique vous pouvez extraire les valeurs des différents #define et les transposé dans Arduino-IDE vous même. Ici il y a des valeur à changés et implique une ou plusieurs recompilation de l'application et la transmettre à nouveau au microcontrôleur. il vous faudra aussi avrdude qui est important à utilisé. Tous est déjà expliqué dans l'application précédente LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino 
+
+### Utilisation visuel de arrayBuilder 
+Ici, il y a une mise à jour de arrayBuilder vous permettant quelques opération via des fenêtres modal à réponse et a résultat. La fonction n'est pas encore officiellement fini en mode visuel, mais permet l'utilisation à travers le terminal.
+
+Dans le cadre de visualisé les #define ajouté à une ligne standard de compilation via arduino-cli vous pouvez tout capturer ainsi:
+
+Chargez la fonction arrayBuilder via l'appel de script bash. À l'intérieur il y a arrayBuilder et arduino-compile 
+**bash**
+
+    . ./Arduino.sh
+
+Renommez le fichier BuildProperty par .BuildProperty
+**bash**
+
+    mv BuildProperty .BuildProperty
+Le fichier va virtuellement disparaître mais sera disponible si vous utilisez 'ls' avec l'option de tout afficher.
+
+Lancement d'arrayBuilder en mode visuel.
+
+**bash**
+
+    ACTION=view BPUseGui=True BPArrayName=BuildProperty BPFileConf=.BuildProperty arrayBuildProperty
+
+Suivez les étapes du haut vers le bas et de gauche à droite.
+
+![Vue view de arrayBuilder ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/arrayBuilder_view_all_windows.png)
+À chaque sélection il faut appuyer sur (OK), à l'exception de la première fenêtre ou il y a le choix "Compile switch" et "Build Property". À l\u2019exception du ficher .BuildProperty qui appartient à arduino-compile. Vous pouvez vous même créer d'autre tableau associatif appellé "Associative Array" et seront aussi visible avec arrayBuilder si vous changez les variables BPArrayName & BPFileConf dans la ligne d'appel de arrayBuilder. La variable BPArrayName est requis pour le nom de vôtre tableau à visualiser et si vous n'avez pas fait de sauvegarde physique d'un Tableau associatif sous le terminal Bash, il faut le crée manuellement. 
+
+Puisque arrayBuilder est conç pour travailler avec arduino-compile, la consultation d'un tableau BuildProperty offres 2 choix, "Compile switch" et "BuildPeroperty", dans le cas d'un Tableau qui ne s'appelle pas BuildProperty dans la même fenêtre vous allez voir "Compile switch" où toutes les nom d'indice commençant par "--" sera visible sous "Compile switch" et le reste via "Index". 
+
+À noté dans la fenêtre "BuildProperty view Windows" tous les paramètres sont écrit un en dessous de l'autre et ne reflète pas la définition dans le fichier et accessible via l'accès direct à BuildProperty['compiler.cpp.extra_flags'] et BuildProperty['compiler.c.extra_flags']
+
+### Créer à des fin de tests un Tableau associatif.
+
+**bash**
+
+    declare -A MonTableau
+    MonTableau['--option1']=None
+    MonTableau['--option2']=Rien
+    MonTableau['compiler.cpp.extra_flags']='-O0'
+
+Sauvegardé MonTableau 
+
+**bash**
+
+    ACTION=save BPUseGui=False BPArrayName=MonTableau BPFileConf=.MonTableau arrayBuildProperty 
+
+Et apparaîtra un fichier du nom ".MonTableau" dans la liste de ficher. Celui-ci sera accessible via la même commande arrayBuilder avec les bons paramètres :
+
+**bash**
+
+    ACTION=view BPUseGui=True BPArrayName=MonTableau BPFileConf=.MonTableau arrayBuilder
+ 
+ ## 6.
+[PARA]
+
+## 7. 
+[PARA]
+
+## 8. 
+[PARA]
+## 9. 
+
+## 10. 
+[PARA]
