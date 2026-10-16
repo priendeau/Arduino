@@ -1,7 +1,7 @@
 
 ## Application SPILM35Ex.ino
 
-l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliqué le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de test. Et ayant ajouté plusieurs commodité à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de capaciteur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO, ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
+l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliquer le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de tests. Et ayant ajouté plusieurs commodités à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de condensateur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO, ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
 
 
 Table des matières :
@@ -27,7 +27,7 @@ Ici, vous voyez 2 LM35DZ côte à côte pincé par une simple pince qui colle l'
 Une fois le diagramme interne inspecté il n'y a que la présence d'une de deux transistors et une ligne de sortie qui garantie via une mini-monitorage de l'ampérage garantisse la sortie à 8.8mV/Celsius et une autre comparateur qui garantie d'élevé la tension à 10mV/Celsius. Alors il s'agit d'un convoyeur d'énergie qui garantie que dans le cas de un transistor 10 fois plus puissant que le transistor de base à eux deux garantissent une sortie final à 10mV/Celsius. Nous parlons ici d'une analyse de flux électrique qui dépend des facteurs extérieur et pratique une compensation avec les comparateurs A1 et A2. De plus il y a une implémentation de pont de résistance Wheatstone entre la série nR1 et ( .125 R2 + R2 ) qui égalise la différence pour calibrer la sortie.   
 
 
-![À gauche, Specification LM35 à l'intérieur, À droite, pont Wheatstone](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/LM35_Internal_schema.png)
+![À gauche, Spécification LM35 à l'intérieur, À droite, pont Wheatstone](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/LM35_Internal_schema.png)
 
 Ici dans le diagramme il y à gauche le schéma interne du LM35 et à droite le pont Wheatstone qui fait office de comparaison pour obtenir la vrai valeur en Ohm de Rx est par l'analyse du courant qui passe entre le pont de division A - ( pont de division C ) où R2 est variable pour l'atteinte de la moitié du voltage et connaître la valeur de Rx.  
 
@@ -68,13 +68,13 @@ Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalen
 |    U3         |    2     | LM35DZ                                          |
 |    U4         |    1     | FTDI-232 USB/TTL loadeur                        |
 |    T1         |    1     | 2n2222 NPN transistor ou le BC337               |
-|    C1         |    1     | 470 uF, 6.3 V Capaciteur polarisé               |
-|    C2-C3      |    2     | 100 uF 6.3-25 V Capaciteur polarisé             |
-|    C4-C5      |    2     | 10 nF 6.3-25 V Capaciteur céramique             |
-|    R1-R3      |    3     | 1 k Ohms Résistance                             |
-|    R3-R4      |    2     | 4k7 Ohms Résistance                             |
-|    R4-R5      |    2     | 10 ou 20 k Ohms Résistance                      |
-|    R6         | 1 ou 3   | 470 Ohms Résistance                             |
+|    C1         |    1     | 470 uF, 6.3 V condensateur polarisé             |
+|    C2-C3      |    2     | 100 uF 6.3-25 V condensateur polarisé           |
+|    C4-C5      |    2     | 10 nF 6.3-25 V condensateur céramique           |
+|    R1-R3      |    3     | 1 k Ohms Résistance 1/4 de watt                 |
+|    R3-R4      |    2     | 4k7 Ohms Résistance 1/4 de watt                 |
+|    R4-R5      |    2     | 10 ou 20 k Ohms Résistance 1/4 de watt          |
+|    R6         | 1 ou 3   | 470 Ohms Résistance 1/4 de watt                 |
 |    P1         | 1 ou 0   | Planche à pain avec rail (facultative)          |
 |    D1         | 1 ou 0   | Dérive de courant à 3V3 et 5V.                  |
 
@@ -83,8 +83,8 @@ Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalen
 |     Nom       | Quantité |           Description des éléments              |        
 |---------------|----------|-------------------------------------------------|
 |    U5         |    1     | AMS-1117-adj ou LM317-ADJ                       |
-|    R6         |    1     | 10 k Ohms Résistance                            |
-|    R7-R8      |    2     | 200 Ohms Résistance                             |
+|    R6         |    1     | 10 k Ohms Résistance 1/4 de watt                |
+|    R7-R8      |    2     | 200 Ohms Résistance 1/4 de watt                 |
 
 ## 4. Plan de construction Arduino à Suivre.
 
@@ -111,7 +111,7 @@ Reference: https://app.cirkitdesigner.com/project/517cf01c-8466-4958-a5d0-4e3969
 
 ## 5. Outils nécessaire pour la réalisation de l'application.
 
-Vous pouvez re-visitez la branche de mon github.com Arduino/LGT8F328/ST7735RotaryBtnEx pour les explications d'installation de arduino-cli, de la fonction arrayBuilder et arduino-compile. Ici il n'y a que l'ajout visuel du arrayBuilder permettant la visualisation avec zenity disponible sous Linux et quelques distribution compatible Posix/Unix, mais zenity étant grandement disponible dans plusieurs distribution Linux, Windows pourrait supporté zenity à travers Mingw32/64 et Msys qui semble toujours disponible pour Windows 11. Cependant Linux est fortement conseillé et OSX reste plus ou moins viable, mais à tous terminal bash disponible il est possible de continuer. 
+Vous pouvez re-visitez la branche de mon github.com Arduino/LGT8F328/ST7735RotaryBtnEx pour les explications d'installation de arduino-cli, de la fonction arrayBuilder et arduino-compile. Ici il n'y a que l'ajout visuel du arrayBuilder permettant la visualisation avec zenity disponible sous Linux et quelques distribution compatible Posix/Unix, mais zenity étant grandement disponible dans plusieurs distribution Linux, Windows pourrait supporté zenity à travers Mingw32/64 et Msys qui semble toujours disponible pour Windows 11. Cependant Linux est fortement conseillé et OSX reste plus ou moins viable, mais à tous terminal Bash disponible il est possible de continuer. 
 
 Ils y a quelques outils non mentionnés qui reste indispensable à la vérification de vôtre montage et vérification de certains pré-requis. 
 
@@ -136,6 +136,7 @@ Le calcul est **Vout = (Vs * R2)/( R1 + R2 )** ou:
 
 La réponse pour le groupe 2 et 3 du pont de division de voltage devrait doné 4.123 volts, cependant au multimètre ça indiquait 4.0 Volts et quelque fois 4.1, mais pas en dessous de 4.0 volts.       
 ![Multimètre ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/multimeter.png)
+
 Deuxièmes fonction importante dans le multimètre est **DC A**. Permettant de réalisé le test suivant qui consiste à alimenté les LM35DZ avec un contrôle d'ampère précis avec le AMS1117-adj et une 10k Ohms et 2x 200 Ohms pour obtenir un jeux de 120u Ampère, le multimètre présent peut indiqué sous la sélection 2m dans la section **DC A** indiquera 0.012 à 0.010 ce qui est apréciable comme précision.
  
 ### Logiciel à utiliser
@@ -169,7 +170,7 @@ Suivez les étapes du haut vers le bas et de gauche à droite.
 
 À chaque sélection il faut appuyer sur (OK), à l'exception de la première fenêtre ou il y a le choix "Compile switch" et "Build Property". À l'exception du ficher .BuildProperty qui appartient à arduino-compile. Vous pouvez vous même créer d'autre tableau associatif appellé "Associative Array" et seront aussi visible avec arrayBuilder si vous changez les variables BPArrayName & BPFileConf dans la ligne d'appel de arrayBuilder. La variable BPArrayName est requis pour le nom de vôtre tableau à visualiser et si vous n'avez pas fait de sauvegarde physique d'un Tableau associatif sous le terminal Bash, il faut le crée manuellement. 
 
-Puisque arrayBuilder est conçu pour travailler avec arduino-compile, la consultation d'un tableau BuildProperty offres 2 choix, "Compile switch" et "BuildPeroperty", dans le cas d'un Tableau qui ne s'appelle pas BuildProperty dans la même fenêtre vous allez voir "Compile switch" où toutes les nom d'indice commençant par "--" sera visible sous "Compile switch" et le reste via "Index". 
+Puisque arrayBuilder est conçu pour travailler avec arduino-compile, la consultation d'un tableau BuildProperty offres 2 choix, "Compile switch" et "BuildProperty", dans le cas d'un Tableau qui ne s'appelle pas BuildProperty dans la même fenêtre vous allez voir "Compile switch" où toutes les nom d'indice commençant par "--" sera visible sous "Compile switch" et le reste via "Index". 
 
 À noté dans la fenêtre "BuildProperty view Windows" tous les paramètres sont écrit un en dessous de l'autre et ne reflète pas la définition dans le fichier et accessible via l'accès direct à BuildProperty['compiler.cpp.extra_flags'] et BuildProperty['compiler.c.extra_flags']
 
@@ -196,10 +197,100 @@ Et apparaîtra un fichier du nom ".MonTableau" dans la liste de ficher. Celui-ci
  
 ## 6. Les détails de réalisations.
  
+ Lors de la connexion de vos composante électronique il est fortement conseillé de le faire en mode hors tension, puisque le microcontrôleur lorsqu'il est configuré avec la programmation il est prêt et ne vous attend pas. Il donnera des informations flous si vous connectez le tous sous tension. Bien identifié la trame de courant. Dans le cas de la planche à pain c'est la ligne de pouvoir qu'il faut change avec des cavaliers. Celle du haut à été configuré à 5V et celle du bas à 3V3. La puce LGT8F328 supporte le 3V3 comme le 5V, mais il faut lire le LDO à côté de la plaquette et c'est cette composante qui décide, dans le cas choisi elle reste à 3V3 même si les 2 trames sont en 5V.  
+ 
 ### Pourquoi le Pont diviseur 1 doit être précis.
+
+À cause dans la programmation de de laboratoire l'estimation du voltage est une réalisation d'une fraction qui implique de multiplier par 2 le résultats. Alors il faut faire des efforts avec le multimètre pour trouver dans vôtre paquet 2 résistance de 10 k Ohms qui indique 10.0 k Ohms à la lecture du multimètre. Cependant, vous pouvez classifiés le groupe de résistance qui sont généralement collé sur papier et prendre une paire similaire tel 9.85 k Ohms ou 10.3 k Ohms. Il est stipulé que les résistance que vous achetez ont une tolérance de 10% vis-à-vis ce qu'elles sont. Alors si vous trouvé 9.75 k Ohms ou 10.5 k Ohms elle ne sont pas les meilleurs, mais si vous avec 2 résistances avec le même résultat hors tolérance, vous avez de la chance. 
+    
 ### Pourquoi ça brûle ?
+
+Un exemple de résistance qui brûle sous le stress. 
+
+![résistances brûlés ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/burn_10ohms_compare.png)
+
+Il s'agit de résistance de 10 Ohms et sous le 3V3 elles ont brulées. Elle indique encore 10 Ohms, mais suite à une question de qu'est-ce qui chauffe et qui sent le plastique qui chauffe. Il s'agissait de résistance qui brûle. La raison pour leur utilisation provient d'une anomalie observée. Mais dans ce cas présent, la résistance est trop base.
+
 ### Si la case Vref sur l'écran n'indique pas le bon voltage ?
 
+![voltage n'est pas fixe ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/anomaly_volt_low.png)
+
+Il s'agit aussi de la même anomalie. Anomalie sur la résistance utilisé et anomalie sur la tension calculé. Celle si apparaît lorsque vous ajoutez à l'intérieur du "pont diviseur 1", une grosse résistance qui prend du temps à charger les 2 condensateurs de cette partie. D'ailleurs ensemble utilisé des résistance base pour accélérer la charge à sa valeur nominale et éviter que la résistance brûle via une plus grosse valeur sont directement lié. Alors dans ce cas si si la valeur de la résistance est 20 k Ohms combien de temps ça peut prendre ?
+
+Aussi importante comme loi, celle du temps de charge  d'un condensateur explique qu'à 10 Ohms la valeur en temps est de 0.00100 secondes mais risque de brûler.  Il faut connaître l'équation de temps de charge et d'énergie impliqué pour la charge. Voici la première équation le temps de charge:
+
+Équation:  **T=RC**
+
+| Symbole| Définition                  |
+|--------|-----------------------------|
+|   T    | Temps de charge             |
+|   R    | Résistance dans le réseau   |
+|   C    | Capacitance associé         |
+
+Alors pour 1 condensateur de 100uF et une résistance de 20 K Ohms prendra 2.00 secondes
+Pour 1 condensateur de 100uF et une résistance de 10 K Ohms prendra 1.00 seconde
+Pour 1 condensateur de 100uF et une résistance de 470 Ohms prendra 0.0470 secondes
+
+Dans le cadre de l'application. les valeurs de base à l'intérieur du Tableau BuildProperty sont indiqué qu'il y a un nombre d'essais et un délai à chaque tentative de lecture. voici les variable:
+
+À l\u2019intérieur de l'index compiler.c.extra_flags et compiler.cpp.extra_flags : 
+**bash**
+
+    view_BuildProperty
+    
+Recherché -DSAMPLING_READ et -DSLEEP_READING
+
+Réponse:
+**bash**
+
+    -DSAMPLING_READ=500 -DSLEEP_READING=30
+
+Il y a 500 lectures qui constitue le phénomène de statistique standard du nombre d'échantillons collecté pour avoir un résultats décent. Dans l'application présente ou à la ligne Vref présente 2584.81 mV n'avait que 100 lecture et la moitié de la valeur de repos. Donnant comme variable:
+
+**bash**
+
+    -DSAMPLING_READ=100 -DSLEEP_READING=15
+
+En gros la boucle principale à l'intérieur de loop() présente une section qui prend l'échantillonage de Vref et de la branche A1 et A2 toute en même temps, à la fin de la boucle sans compter le temps que la fonction AnalogRead(...) enregistre les valeurs. Il se passera:
+
+- À 500 valeurs et 30ms de pause par échantillonage .
+	- Délai de 15 secondes. 
+- À 100 valeurs et 15ms de pause par échantillonage .
+	- Délai de 1.5 secondes.   
+
+Il y a 2 condensateurs à chargés donc:
+
+- À 10 K Ohms , le temps de charge passe à 	2.00 secondes.
+- À 20 K Ohms, le temps de charge passe à 4.00 secondes
+
+Alors, 500 valeurs sont court pour considérer la première valeur intacte. Autre possibilité. Dans la section setup() ou commence la déclaration des Branche à configurer en mode LECTURE ou ÉCRITURE, il faut ajouté plus de temps à la commande delay() pour obtenir une valeur uniforme ou le microcontrôleur aurait déjà eu le temps nécessaire pour stabiliser la charge et commencer à opérer. N'oubliez pas Les ponts de division 1 à 3 sont directement connectés au voltage de de la planche à pain. Mais aussi c'est le transistor qui dépend du microcontrôleur et est déconseillé de monitoré le voltage de l'un des pont 1 et 2 puisqu'ils sont réveillé avant la pratique de l'échantillonage et endormis de 1 à 3 secondes après échantillonnage. 
+
+Dans la liste du matériel il est inscrit un nombre supplémentaire de résistance de 470 Ohms, pouvant être une alternative. Combien de temps de charge cela prendra-t-il ?   
+
+### Énergie de charge des condensateur du pont diviseur 1
+
+Quel énergie est impliqué dans la charge des 2 capaciteurs, et est-ce que l'utilisation des résistances change quelque chose ?
+
+À l'équation **E=CV^2/2** qui est l'énergie impliqué dans la charge d'un condensateur, il n'y a pas de valeur associé à **R** pour la résistance la réponse devrait être généralement non ! 
+
+Équation **E=CV^2/2**
+
+| Symbole| Définition                  |
+|--------|-----------------------------|
+|   E    |  Énergie total en Coulomb   |
+|   C    |  Capacitance en Farad       |
+|   V    |  Voltage appliqué           |
+
+
+Énergie utilisé:
+
+- À 10 Ohms, 470 Ohms, 10 et 20 k Ohms la réponse reste ( 0.000544 * 2 ) pour 2 condensateur .    
+- 0.001088 Coulombs, qui sont apparemment trop élevé pour supporté une charge de 0.00100 secondes sur deux résistances à 10 Ohms. Petit ajout les résistances utilisés sont des 1/4 de watt.
+
+Selon la définition de Watt qui représente Joule par seconde (J/s) Si le E de l'énergie en coulomb est relationnel, alors le nombre de Watts pour 2 résistances d 10 Ohms se calcul ainsi:
+
+0.001088 Coulombs / 0.00100 secondes = 1.088 Watts et des résistance en série reste avec le même potentiel de résistance 1/4 Watts, soit le montage du pont de division 1 ici présent prouve que l'effort génère 1.088 Watts ce qui est beaucoup pour 2 résistances en série de 1/4 de Watt.
+ 
 ## 7. 
 [PARA]
 
