@@ -1,7 +1,7 @@
 
 ## Application SPILM35Ex.ino
 
-l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliquer le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de tests. Et ayant ajouté plusieurs commodités à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de condensateur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO, ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
+l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino(1) est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliquer le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de tests. Et ayant ajouté plusieurs commodités à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de condensateur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO(2), ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
 
 
 Table des matières :
@@ -24,17 +24,17 @@ Ici, vous voyez 2 LM35DZ côte à côte pincé par une simple pince qui colle l'
 
 ![enter image description here](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_dual-lm35_small.png)
 
-Une fois le diagramme interne inspecté il n'y a que la présence d'une de deux transistors et une ligne de sortie qui garantie via une mini-monitorage de l'ampérage garantisse la sortie à 8.8mV/Celsius et une autre comparateur qui garantie d'élevé la tension à 10mV/Celsius. Alors il s'agit d'un convoyeur d'énergie qui garantie que dans le cas de un transistor 10 fois plus puissant que le transistor de base à eux deux garantissent une sortie final à 10mV/Celsius. Nous parlons ici d'une analyse de flux électrique qui dépend des facteurs extérieur et pratique une compensation avec les comparateurs A1 et A2. De plus il y a une implémentation de pont de résistance Wheatstone entre la série nR1 et ( .125 R2 + R2 ) qui égalise la différence pour calibrer la sortie.   
+Une fois le diagramme interne inspecté il n'y a que la présence d'une de deux transistors et une ligne de sortie qui garantie via une mini-monitorage de l'ampérage garantisse la sortie à 8.8mV/Celsius et une autre comparateur qui garantie d'élevé la tension à 10mV/Celsius. Alors il s'agit d'un convoyeur d'énergie qui garantie que dans le cas de un transistor 10 fois plus puissant que le transistor de base à eux deux garantissent une sortie final à 10mV/Celsius. Nous parlons ici d'une analyse de flux électrique qui dépend des facteurs extérieur et pratique une compensation avec les comparateurs A1 et A2. De plus il y a une implémentation de pont de résistance Wheatstone(3) entre la série nR1 et ( .125 R2 + R2 ) qui égalise la différence pour calibrer la sortie.   
 
 
 ![À gauche, Spécification LM35 à l'intérieur, À droite, pont Wheatstone](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/LM35_Internal_schema.png)
 
-Ici dans le diagramme il y à gauche le schéma interne du LM35 et à droite le pont Wheatstone qui fait office de comparaison pour obtenir la vrai valeur en Ohm de Rx est par l'analyse du courant qui passe entre le pont de division A - ( pont de division C ) où R2 est variable pour l'atteinte de la moitié du voltage et connaître la valeur de Rx.  
+Ici dans le diagramme il y à gauche le schéma interne du LM35 et à droite le pont Wheatstone(3) qui fait office de comparaison pour obtenir la vrai valeur en Ohm de Rx est par l'analyse du courant qui passe entre le pont de division A - ( pont de division C ) où R2 est variable pour l'atteinte de la moitié du voltage et connaître la valeur de Rx.  
 
 
 ## 2. Description de l'activité.
 
-L'activité à pour but de qualifié si vous cherchez de prendre la température via une sonde ou une prise générale de la température. Vous pouvez passez à travers une grande quantité de LM35DZ, les 5 spécimens testé donne des résultats plus haut que prévue, mais quelque fois donne vraiment la bonne température. Les conditions lors de l'écriture de l'activité était en automne et les journées froides et sombres sont plus fidèle de reflété une température au thermostat et les journées humide et ensoleillés ont donnés des résultats élevés. Cependant entre la section ombragé de la maison et la section sous-sols donne des résultats élevés et pourtant le solarium ou il devrait faire la température indiqué sur l'écran semble valide, mais n'a pas changé de son démarrage dans le sous-sol. Alors les conditions internes sont absolument géré par la présence du soleil et l'énergie total disponible dans environnement sous ensoleillement. Il va de pair que la méthodologie à l'intérieur du LM35 ne fait qu'un calcul de d'évidement entre un gros transistor 10x plus puissant que celui qui récrimine et réalimente la valeur de base à 1.38 volts (voir le schéma LM35). 
+L'activité à pour but de qualifié si vous cherchez de prendre la température via une sonde ou une prise générale de la température. Vous pouvez passez à travers une grande quantité de LM35DZ, les 5 spécimens testé donne des résultats plus haut que prévue, mais quelque fois donne vraiment la bonne température. Les conditions lors de l'écriture de l'activité était en automne et les journées froides et sombres sont plus fidèle de reflété une température au thermostat et les journées humide et ensoleillés ont donnés des résultats élevés. Cependant entre la section ombragé de la maison et la section sous-sols donne des résultats élevés et pourtant le solarium ou il devrait faire la température indiqué sur l'écran semble valide, mais n'a pas changé de son démarrage dans le sous-sol. Alors les conditions internes sont absolument géré par la présence du soleil et l'énergie total disponible dans environnement sous ensoleillement. Il va de pair que la méthodologie à l'intérieur du LM35 ne fait qu'un calcul de d'évidement entre un gros transistor 10x plus puissant que celui qui récrimine et réalimente la valeur de base à 1.38 volts (voir le schéma LM35DZ). 
 
 ### Domaine d'hypothèse. 
 
@@ -43,17 +43,17 @@ Comparé avec une recharge sans-fil appelé par induction certaines montre moder
 
 Le LM35DZ, celui qui ne dépend pas de la calibration du voltage de Vout et Gnd (appellé LM35) qui donne en autre des valeurs en Kelvin. le LM35DZ se connecte à 4 Volts et supporte une tension au plus de 30V. La sortie sortie étant unilatéralement entre 55mV à -55 et de 1.00 Volt à 100 Dégrée Celsius peut être connecté à un microcontrôleur opérant à 5V ou 3V3, mais ne peut fonctionné avec le voltage du 3V3, rapporte encore plus de différence avec un microcontrôleur 3V3. L'astuce est de garantir un voltage d'au moins 4 volts. Il n'y a pas que le LM35DZ qui demande des contraintes similaires. Le DHT11, AMT22 sont aussi avec le même régime d'alimentation qui est au moins 4Volts. 
 
-L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un   
+L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN(4) pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un   
 
 ![La planche à pain avec l'écran](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-3.png)
 
 ### Description de l'image
 
-Ici dans l'image de "La planche à pain avec l'écran", il y a au centre l'écran SPI ST7735 à 80x160 qui marche à l'envers, il y la fonction spécial qui prévoit économisé une Pin de sur le microcontrôleur et utilise conjointement la Pin "Res" sur l'écran est connecté sur le Reset du microcontrôleur. En arrière de l'écran il y a la partie pont de division de courant à base de 2 résistance et de deux condensateur. À gauche du pont principal il y a les deux LM35DZ cadencé avec un transistor ici non visible à cause de la pair de fils violet-bleu-vert vous ne pouvez voir que la résistance de 470 Ohms en dessous de la pair de fils.  À droite totalement sur la planche à pain, la barre d'alimentation avec les ams1117 en format 3V3 et 5V. Le tout est relié à un paquet de batterie 18650 qui sont convertis en alimentation compatible USB ou un 5V. Il va de même que l'alimentation jusqu'à 12V est inclus et donne le même résultats sinon un plus grand décalage à cause qu'il y a plus de stress pour convertir la tension en 3V3 et 5V. Noté que le rail du haut ou jonction de courant du haut est à 5V et celle du bas à 3V3. le microcontrôleur LGT8F328 supporte le 3V3 comme le 5V. Le cas échéant nôtre microcontrôleur est un 3V3 et ne peut alimenté directement les LM35DZ. De plus dans l'application la dernière ligne avec le Vref ou il est indiqué 5147mV correspond à une approximation avec le résultat du premier pont monitoré avec la branche A0.  
+Ici dans l'image de "La planche à pain avec l'écran", il y a au centre l'écran SPI(5) ST7735 à 80x160 qui marche à l'envers, il y la fonction spécial qui prévoit économisé une Pin de sur le microcontrôleur et utilise conjointement la Pin "Res" sur l'écran est connecté sur le Reset du microcontrôleur. En arrière de l'écran il y a la partie pont de division de courant à base de 2 résistance et de deux condensateur. À gauche du pont principal il y a les deux LM35DZ cadencé avec un transistor ici non visible à cause de la pair de fils violet-bleu-vert vous ne pouvez voir que la résistance de 470 Ohms en dessous de la pair de fils.  À droite totalement sur la planche à pain, la barre d'alimentation avec les ams1117 en format 3V3 et 5V. Le tout est relié à un paquet de batterie 18650 qui sont convertis en alimentation compatible USB ou un 5V. Il va de même que l'alimentation jusqu'à 12V est inclus et donne le même résultats sinon un plus grand décalage à cause qu'il y a plus de stress pour convertir la tension en 3V3 et 5V. Noté que le rail du haut ou jonction de courant du haut est à 5V et celle du bas à 3V3. le microcontrôleur LGT8F328 supporte le 3V3 comme le 5V. Le cas échéant nôtre microcontrôleur est un 3V3 et ne peut alimenté directement les LM35DZ. De plus dans l'application la dernière ligne avec le Vref ou il est indiqué 5147mV correspond à une approximation avec le résultat du premier pont monitoré avec la branche A0.  
  
-### Précaution à prendre pour la substitution d'un transistor NPN.
+### Précaution à prendre pour la substitution d'un transistor NPN(4).
 
-Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalent et est disponible chez Addison Électronique, ou en ligne dans un centre de détail. Aliexpress offrent de plus en plus des transistor de type US, mais inclus librement les transistor Internationaux ou Chinois tel le BC337. Il y a une petite différence. Tous les deux partagent la base sur la pin numéro 2, mais le Collecteur et l'Émetteur sont inversé dans le cas du BC337 donc lorsqu'il mentionné de connecté l'Émetteur à la base pour le 2n2222 il s'agit de la pin 1 à la gauche lorsque le transistor affiche la face plate vers vous et dans le cas du BC337, BC547, BC548, BC549, BC550, la pin Émetteur est la dernière à droite. Pour substitué le 2n2222 vous pouvez le remplacé par le 2n4401 qui est aussi NPN. Le schéma présenté pour connecté le LM35DZ à un transistor NPN est différent d'un schéma PNP puisque la définition du NPN est de bloqué la base du courant pour y laisser fuir ( phénomène d'écoulement ou "Sinking" ) l'électricité vers l'émetteur qui va vers la base ou "Ground" en anglais.
+Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalent et est disponible chez Addison Électronique, ou en ligne dans un centre de détail. Aliexpress(6) offrent de plus en plus des transistor de type US, mais inclus librement les transistor Internationaux ou Chinois tel le BC337. Il y a une petite différence. Tous les deux partagent la base sur la pin numéro 2, mais le Collecteur et l'Émetteur sont inversé dans le cas du BC337 donc lorsqu'il mentionné de connecté l'Émetteur à la base pour le 2n2222 il s'agit de la pin 1 à la gauche lorsque le transistor affiche la face plate vers vous et dans le cas du BC337, BC547, BC548, BC549, BC550, la pin Émetteur est la dernière à droite. Pour substitué le 2n2222 vous pouvez le remplacé par le 2n4401 qui est aussi NPN. Le schéma présenté pour connecté le LM35DZ à un transistor NPN(4) est différent d'un schéma PNP(7) puisque la définition du NPN(4) est de bloqué la base du courant pour y laisser fuir ( phénomène d'écoulement ou "Sinking(8)" ) l'électricité vers l'émetteur qui va vers la base ou "Ground" en anglais.
 
 ![À gauche le transistor 2n2222. À droite le transistor BC337](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/2N2222-Pinout.jpg)
 
@@ -88,7 +88,7 @@ Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalen
 
 ## 4. Plan de construction Arduino à Suivre.
 
-Le schéma ici présent gracieuseté "Cirkit Designer" est gratuits et si les pièces ne sont pas disponible dans la liste des composantes, vous pouvez les ajoutées avec une photo et une reconnaissance des bornes de connections. Ici présent la plaquette microcontrôleur LGT8F328 à été ajouté manuellement et le code via le lien fournis pour visiter aussi le site en question accepte mais ne peut faire de simulation puisque le c\u0153ur lgt8fx:avr de DBUEZA n'est pas ajouté ou testé. 
+Le schéma ici présent gracieuseté "Cirkit Designer" est gratuits et si les pièces ne sont pas disponible dans la liste des composantes, vous pouvez les ajoutées avec une photo et une reconnaissance des bornes de connections. Ici présent la plaquette microcontrôleur LGT8F328 à été ajouté manuellement et le code via le lien fournis pour visiter aussi le site en question accepte mais ne peut faire de simulation puisque le c\u0153ur lgt8fx:avr de DBUEZA(9) n'est pas ajouté ou testé. 
 
 Les contacts sont en l'air, et est une représentation imagé entre un vrai plan électronique de type ingénieur, mais tous les contacts sont présent. Vous pouvez établir une relation de contact-en-l'air vers planche à pain sans problème. C'est que la représentation planche à pain n'est pas fidèle à la réalité et il faudrait une très grosse planche à pain pour ajouté les 3 ponts de divisions. Et il n'y a tellement pas beaucoup de connexions que la lecture via planche à pain est fastidieuse.
 
@@ -111,7 +111,7 @@ Reference: https://app.cirkitdesigner.com/project/517cf01c-8466-4958-a5d0-4e3969
 
 ## 5. Outils nécessaire pour la réalisation de l'application.
 
-Vous pouvez re-visitez la branche de mon github.com Arduino/LGT8F328/ST7735RotaryBtnEx pour les explications d'installation de arduino-cli, de la fonction arrayBuilder et arduino-compile. Ici il n'y a que l'ajout visuel du arrayBuilder permettant la visualisation avec zenity disponible sous Linux et quelques distribution compatible Posix/Unix, mais zenity étant grandement disponible dans plusieurs distribution Linux, Windows pourrait supporté zenity à travers Mingw32/64 et Msys qui semble toujours disponible pour Windows 11. Cependant Linux est fortement conseillé et OSX reste plus ou moins viable, mais à tous terminal Bash disponible il est possible de continuer. 
+Vous pouvez re-visitez la branche de mon github.com Arduino/LGT8F328/ST7735RotaryBtnEx pour les explications d'installation de arduino-cli(10), de la fonction arrayBuilder(11) et arduino-compile(12). Ici il n'y a que l'ajout visuel du arrayBuilder(13) permettant la visualisation avec zenity disponible sous Linux et quelques distribution compatible Posix/Unix(14), mais zenity étant grandement disponible dans plusieurs distribution Linux, Windows pourrait supporté zenity à travers Mingw32/64(15) et Msys(16) qui semble toujours disponible pour Windows 11. Cependant Linux est fortement conseillé et OSX(17) reste plus ou moins viable, mais à tous terminal Bash(18) disponible il est possible de continuer. 
 
 Ils y a quelques outils non mentionnés qui reste indispensable à la vérification de vôtre montage et vérification de certains pré-requis. 
 
@@ -119,7 +119,7 @@ Adaptateur prérequis pour envoyer du code binaire au microcontrôleur
 
 ![FTDI2232 USB/TTL convertisseur ](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/ftdi_232.png)
 
-Paquet de batterie avec support USB. Cette version cheap acquis sur AliExpress est correct. Offre une entrée de charge en USB micro et type-C. Offrent 2 sortie USB-A, utilise 3 batteries 18650. Cependant les 3 batteries en main sont des 10000mAh et la charge interne à ce paquet n'est pas fidèle à la recharge. L'avantage de petites lumières sur le dessus pour éclairé vos montage dans le noir si vous avez peu de lumière sur vôtre place de montage favoris. 
+Paquet de batterie avec support USB(19). Cette version cheap acquis sur AliExpress est correct. Offre une entrée de charge en USB micro et type-C. Offrent 2 sortie USB-A, utilise 3 batteries 18650. Cependant les 3 batteries en main sont des 10000mAh et la charge interne à ce paquet n'est pas fidèle à la recharge. L'avantage de petites lumières sur le dessus pour éclairé vos montage dans le noir si vous avez peu de lumière sur vôtre place de montage favoris. 
 
 ![paquet de batterie rechargeable, USB](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/batterie_pack.png)
 
@@ -140,7 +140,7 @@ La réponse pour le groupe 2 et 3 du pont de division de voltage devrait doné 4
 Deuxièmes fonction importante dans le multimètre est **DC A**. Permettant de réalisé le test suivant qui consiste à alimenté les LM35DZ avec un contrôle d'ampère précis avec le AMS1117-adj et une 10k Ohms et 2x 200 Ohms pour obtenir un jeux de 120u Ampère, le multimètre présent peut indiqué sous la sélection 2m dans la section **DC A** indiquera 0.012 à 0.010 ce qui est apréciable comme précision.
  
 ### Logiciel à utiliser
- Le logiciel en mode texte ou terminal du type arduino-cli est important. Dans la version développé ici est conçu pour utiliser une table de #define qui ont tous une valeur par défaut. En utilisant l'application arrayBuilder en mode graphique vous pouvez extraire les valeurs des différents #define et les transposé dans Arduino-IDE vous même. Ici il y a des valeur à changés et implique une ou plusieurs recompilation de l'application et la transmettre à nouveau au microcontrôleur. il vous faudra aussi avrdude qui est important à utilisé. Tous est déjà expliqué dans l'application précédente LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino 
+ Le logiciel en mode texte ou terminal du type arduino-cli est important. Dans la version développé ici est conçu pour utiliser une table de #define(20) qui ont tous une valeur par défaut. En utilisant l'application arrayBuilder en mode graphique vous pouvez extraire les valeurs des différents #define et les transposé dans Arduino-IDE(21) vous même. Ici il y a des valeur à changés et implique une ou plusieurs recompilation de l'application et la transmettre à nouveau au microcontrôleur. il vous faudra aussi avrdude(22) qui est important à utilisé. Tous est déjà expliqué dans la branche de l'application  précédente LGT8F328/ST7735RotaryBtnEx 
 
 ### Utilisation visuel de arrayBuilder 
 Ici, il y a une mise à jour de arrayBuilder vous permettant quelques opération via des fenêtres modal à réponse et a résultat. La fonction n'est pas encore officiellement fini en mode visuel, mais permet l'utilisation à travers le terminal.
@@ -150,13 +150,21 @@ Dans le cadre de visualisé les #define ajouté à une ligne standard de compila
 Chargez la fonction arrayBuilder via l'appel de script bash. À l'intérieur il y a arrayBuilder et arduino-compile 
 **bash**
 
+    . ./aliasrc
     . ./Arduino.sh
+     
 
 Renommez le fichier BuildProperty par .BuildProperty
 **bash**
 
     mv BuildProperty .BuildProperty
-Le fichier va virtuellement disparaître mais sera disponible si vous utilisez 'ls' avec l'option de tout afficher.
+Le fichier va virtuellement disparaître mais sera disponible si vous utilisez 'ls(23)' avec l'option de tout afficher.
+
+Chargement Pré-requis:
+
+**bash**
+
+	load_BuildProperty
 
 Lancement d'arrayBuilder en mode visuel.
 
@@ -245,7 +253,7 @@ Réponse:
 
     -DSAMPLING_READ=500 -DSLEEP_READING=30
 
-Il y a 500 lectures qui constitue le phénomène de statistique standard du nombre d'échantillons collecté pour avoir un résultats décent. Dans l'application présente ou à la ligne Vref présente 2584.81 mV n'avait que 100 lecture et la moitié de la valeur de repos. Donnant comme variable:
+Il y a 500 lectures qui constitue le phénomène de statistique standard du nombre d'échantillons collecté pour avoir un résultats décent. Dans l'application présente ou à la ligne Vref(24) présente 2584.81 mV n'avait que 100 lecture et la moitié de la valeur de repos. Donnant comme variable:
 
 **bash**
 
@@ -269,7 +277,7 @@ Dans la liste du matériel il est inscrit un nombre supplémentaire de résistan
 
 ### Énergie de charge des condensateur du pont diviseur 1
 
-Quel énergie est impliqué dans la charge des 2 capaciteurs, et est-ce que l'utilisation des résistances change quelque chose ?
+Quel énergie est impliqué dans la charge des 2 condensateurs, et est-ce que l'utilisation des résistances change quelque chose ?
 
 À l'équation **E=CV^2/2** qui est l'énergie impliqué dans la charge d'un condensateur, il n'y a pas de valeur associé à **R** pour la résistance la réponse devrait être généralement non ! 
 
@@ -284,7 +292,7 @@ Quel énergie est impliqué dans la charge des 2 capaciteurs, et est-ce que l'ut
 
 Énergie utilisé:
 
-- À 10 Ohms, 470 Ohms, 10 et 20 k Ohms la réponse reste ( 0.000544 * 2 ) pour 2 condensateur .    
+- À 10 Ohms, 470 Ohms, 10 et 20 k Ohms la réponse reste ( 0.000544 * 2 ) pour 2 condensateurs .    
 - 0.001088 Coulombs, qui sont apparemment trop élevé pour supporté une charge de 0.00100 secondes sur deux résistances à 10 Ohms. Petit ajout les résistances utilisés sont des 1/4 de watt.
 
 Selon la définition de Watt qui représente Joule par seconde (J/s) Si le E de l'énergie en coulomb est relationnel, alors le nombre de Watts pour 2 résistances d 10 Ohms se calcul ainsi:
@@ -300,3 +308,34 @@ Selon la définition de Watt qui représente Joule par seconde (J/s) Si le E de 
 
 ## 10. 
 [PARA]
+
+## Réference
+
+note:
+-	(1) : LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino ou
+	-	LGT8F328/ST7735RotaryBtnEx font référence à https://github.com/priendeau/Arduino/tree/main/LGT8F328/ST7735RotaryBtnEx
+- (2) : LDO : Pour "Low-Drop-Out voltage componnent".
+- (3) : Wheatstone       : Un pont de Wheatstone est un circuit électrique utilisé pour mesurer une résistance électrique inconnue en équilibrant deux branches parallèles formant des diviseurs de tension.
+- (4) : NPN              : Un transistor NPN est un type de transistor à jonction bipolaire (BJT) formé en intercalant une fine couche de semi-conducteur de type p entre deux couches de semi-conducteur de type n.
+- (5) : SPI              : L'interface série périphérique (SPI) est un protocole de communication série synchrone développé par Motorola dans les années 1980.
+- (6) : Aliexpress       : Site web de marché en ligne pour divers produits.
+- (7) : PNP              : Un transistor PNP est un type de transistor à jonction bipolaire (BJT) formé en intercalant une fine couche de semi-conducteur de type n entre deux couches de semi-conducteur de type p.
+- (8) : Sinking          : Méthode découlement de l'énergie à travers un transistor. Il y a alimentation à la source ou reflux via la base.
+- (9) : DBUEZA           : github pour utilisateur qui a dévelopé le code pour la famille LGT8FX, https://github.com/dbuezas 
+- (10) : arduino-cli     : application Open Source disponible sous Windows, Mac, Linux pour compiler du code pour microcontrolleur
+- (11) : arrayBuilder    : fonction Bash sous Linux personellement développé.
+- (12) : arduino-compile : fonction Bash sous Linux personellement développé utilisant arrayBuilder pour compiler du code pour microcontrolleur . 
+- (13) : zenity          : application Linux sous Gome/XWindows/Kde à interface modale configurable pour intéraction avec l'utilisateur.
+- (14) : Posix/Unix      : L'interface POS (Portable Operating System Interface) est une famille de normes spécifiées par l'IEEE Computer Society pour assurer la compatibilité entre les systèmes d'exploitation.
+- (15) : Mingw32/64      : API de développement quasi POSIX émulant Linux sous Windows depuis Windows 98. 
+- (16) : Msys            : Système Unix d'interface pour la gestion matériel et des fichiers similaire à Bash sous Windows depuis Windows 98.
+- (17) : OSX             : Système d'opération pour produit Appel . 
+- (18) : Bash            : Provenant de "Bourne Again SHell", est un interpréteur de commandes interactif et un langage de commande développés pour les systèmes d'exploitation de type Unix. Soutenu par la Free Software Foundation et créé en 1989.
+- (19) : USB             : Universal Serial Bus.
+- (20) : #define         : Relatif au langage de programmation C/C++.
+- (21) : Arduino-IDE     : L'IDE Arduino (environnement de développement intégré) est un logiciel open source utilisé pour écrire, compiler et téléverser du code (appelé « sketches ») vers des cartes Arduino et des cartes à microcontrôleur compatibles.
+- (22) : avrdude         : AVRDUDE (AVR Downloader/Uploader) est un utilitaire en ligne de commande gratuit et open source utilisé pour programmer les mémoires intégrées des microcontrôleurs AVR de Microchip (anciennement Atmel).
+- (23) : ls              : Commande sous Linux sh / bash, défile la liste des fichiers et génère de l'information associé aux fichers tels l'espace requis.
+- (24) : Vref            : Diminutif pour Voltage Reference.
+
+
