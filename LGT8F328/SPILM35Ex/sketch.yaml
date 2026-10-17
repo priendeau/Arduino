@@ -1,0 +1,4 @@
+default_fqbn: lgt8fx:avr:328 
+always_export_binaries: true
+default_port: /dev/ttyUSB0
+
