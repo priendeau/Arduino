@@ -322,9 +322,9 @@ note:
 - (7) : PNP              : Un transistor PNP est un type de transistor à jonction bipolaire (BJT) formé en intercalant une fine couche de semi-conducteur de type n entre deux couches de semi-conducteur de type p.
 - (8) : Sinking          : Méthode découlement de l'énergie à travers un transistor. Il y a alimentation à la source ou reflux via la base.
 - (9) : DBUEZA           : github pour utilisateur qui a dévelopé le code pour la famille LGT8FX, https://github.com/dbuezas 
-- (10) : arduino-cli     : application Open Source disponible sous Windows, Mac, Linux pour compiler du code pour microcontrolleur
-- (11) : arrayBuilder    : fonction Bash sous Linux personellement développé.
-- (12) : arduino-compile : fonction Bash sous Linux personellement développé utilisant arrayBuilder pour compiler du code pour microcontrolleur . 
+- (10) : arduino-cli     : application Open Source disponible sous Windows, Mac, Linux pour compiler du code pour microcontrôleur
+- (11) : arrayBuilder    : fonction Bash sous Linux personnellement développé.
+- (12) : arduino-compile : fonction Bash sous Linux personnellement développé utilisant arrayBuilder pour compiler du code pour microcontrôleur . 
 - (13) : zenity          : application Linux sous Gome/XWindows/Kde à interface modale configurable pour intéraction avec l'utilisateur.
 - (14) : Posix/Unix      : L'interface POS (Portable Operating System Interface) est une famille de normes spécifiées par l'IEEE Computer Society pour assurer la compatibilité entre les systèmes d'exploitation.
 - (15) : Mingw32/64      : API de développement quasi POSIX émulant Linux sous Windows depuis Windows 98. 
@@ -335,7 +335,7 @@ note:
 - (20) : #define         : Relatif au langage de programmation C/C++.
 - (21) : Arduino-IDE     : L'IDE Arduino (environnement de développement intégré) est un logiciel open source utilisé pour écrire, compiler et téléverser du code (appelé « sketches ») vers des cartes Arduino et des cartes à microcontrôleur compatibles.
 - (22) : avrdude         : AVRDUDE (AVR Downloader/Uploader) est un utilitaire en ligne de commande gratuit et open source utilisé pour programmer les mémoires intégrées des microcontrôleurs AVR de Microchip (anciennement Atmel).
-- (23) : ls              : Commande sous Linux sh / bash, défile la liste des fichiers et génère de l'information associé aux fichers tels l'espace requis.
-- (24) : Vref            : Diminutif pour Voltage Reference.
+- (23) : ls              : Commande sous Linux sh / bash, défile la liste des fichiers et génère de l'information associé aux fichiers tels l'espace requis.
+- (24) : Vref            : Diminutif pour Voltage Référence.
 
 
