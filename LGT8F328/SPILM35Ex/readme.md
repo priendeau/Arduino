@@ -325,7 +325,9 @@ Selon la définition de Watt qui représente Joule par seconde (J/s) Si le E de 
 Suite à l'observation dans le sous chapitre 'Point de vue avec la réalité', les résultats ne sont pas concluant. Mais avec le sous chapitre précédent, nous avons calculé la charge de plus de 1.088 Watts pour deux résistances expliquant pourquoi deux résistances peuvent brulées. Est-ce que le pont diviseur 2 et 3 serait trop petit et développerait une condition de stress électrique ? Alors retirez les résistances 1.0 k Ohms et 4.7 k Ohms et remplacés-les par 2.2 k Ohms et 10 k Ohms. Toujours sur la trame 5V.
 
 ![Nouvelle configuration](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/new_divider.png)
+
 Après 2 minutes voici le résultat:
+
 ![Nouvelle configuration](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-6.png)
 
 Beaucoup plus proche de la réalité, cependant les résultats varient encore. Question, doit-on utiliser des résistances à plus petite valeur ou à plus grande valeur pour réduire le stress électrique ? 
@@ -360,6 +362,8 @@ Voici la liste:
 
 ## Réference
 
+
+
 note:
 -	(1) : LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino ou
 	-	LGT8F328/ST7735RotaryBtnEx font référence à https://github.com/priendeau/Arduino/tree/main/LGT8F328/ST7735RotaryBtnEx
@@ -388,3 +392,6 @@ note:
 - (24) : Vref            : Diminutif pour Voltage Référence.
 - (25) : SMPS            : Une **SMPS** (_Switched-Mode Power Supply_ ou alimentation à découpage) est un type de bloc d'alimentation électronique qui convertit et régule le courant électrique de manière très efficace.
 - (26) : PD              : La **technologie PD** est le protocole intelligent qui gère le transfert rapide d'énergie ; un câble ou un port USB-C ne garantit donc pas automatiquement la compatibilité Power Delivery.
+
+
+
