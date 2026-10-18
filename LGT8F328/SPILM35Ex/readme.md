@@ -38,18 +38,24 @@ L'activité à pour but de qualifié si vous cherchez de prendre la température
 
 ### Domaine d'hypothèse. 
 
-Comparé avec une recharge sans-fil appelé par induction certaines montre moderne nécessite une recharge par induction et sont extrêmement chaude suite à l'induction du voltage et le capteur de voltage. Descendre la chaleur résiduelle pour éviter que la montre soit brûlante, implique que le chargeur devrait être équipé d'un évaluateur de passage d'énergie et entre dans le domaine du LM35. Travaillant avec le phénomène de charge et d'impulsion une charge rapide impliquerait aussi d'injecté à plus haute fréquence l'impulsion et génèrerait plus de courant en passage. Le LM35 conditionnerait l'empêchement d'atteindre des valeurs qui brûle l'utilisateur ou de faire fondre le plastique de la montre.
+Comparé avec une recharge sans-fil appelé par induction certaines montre moderne nécessite une recharge par induction et sont extrêmement chaude suite à l'induction du voltage et le capteur de voltage. Descendre la chaleur résiduelle pour éviter que la montre soit brûlante, implique que le chargeur devrait être équipé d'un évaluateur de passage d'énergie et entre dans le domaine du LM35. Travaillant avec le phénomène de charge et d'impulsion une charge rapide impliquerait aussi d'injecté à plus haute fréquence l'impulsion et génèrerait plus de courant en passage. Le LM35 conditionnerait l'empêchement d'atteindre des valeurs qui brûle l'utilisateur ou de faire fondre le plastique de la montre. Cette idée démontré serait issue de quel facteur dans un circuit électrique.  
   
 
 Le LM35DZ, celui qui ne dépend pas de la calibration du voltage de Vout et Gnd (appellé LM35) qui donne en autre des valeurs en Kelvin. le LM35DZ se connecte à 4 Volts et supporte une tension au plus de 30V. La sortie sortie étant unilatéralement entre 55mV à -55 et de 1.00 Volt à 100 Dégrée Celsius peut être connecté à un microcontrôleur opérant à 5V ou 3V3, mais ne peut fonctionné avec le voltage du 3V3, rapporte encore plus de différence avec un microcontrôleur 3V3. L'astuce est de garantir un voltage d'au moins 4 volts. Il n'y a pas que le LM35DZ qui demande des contraintes similaires. Le DHT11, AMT22 sont aussi avec le même régime d'alimentation qui est au moins 4Volts. 
 
-L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN(4) pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un   
+L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN(4) pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un pont de division à base de résistance.
+
+Ici les pont 2 et 3 sont à base de résistances 1 k Ohms et 4.7 k Ohms   
 
 ![La planche à pain avec l'écran](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-3.png)
 
 ### Description de l'image
 
-Ici dans l'image de "La planche à pain avec l'écran", il y a au centre l'écran SPI(5) ST7735 à 80x160 qui marche à l'envers, il y la fonction spécial qui prévoit économisé une Pin de sur le microcontrôleur et utilise conjointement la Pin "Res" sur l'écran est connecté sur le Reset du microcontrôleur. En arrière de l'écran il y a la partie pont de division de courant à base de 2 résistance et de deux condensateur. À gauche du pont principal il y a les deux LM35DZ cadencé avec un transistor ici non visible à cause de la pair de fils violet-bleu-vert vous ne pouvez voir que la résistance de 470 Ohms en dessous de la pair de fils.  À droite totalement sur la planche à pain, la barre d'alimentation avec les ams1117 en format 3V3 et 5V. Le tout est relié à un paquet de batterie 18650 qui sont convertis en alimentation compatible USB ou un 5V. Il va de même que l'alimentation jusqu'à 12V est inclus et donne le même résultats sinon un plus grand décalage à cause qu'il y a plus de stress pour convertir la tension en 3V3 et 5V. Noté que le rail du haut ou jonction de courant du haut est à 5V et celle du bas à 3V3. le microcontrôleur LGT8F328 supporte le 3V3 comme le 5V. Le cas échéant nôtre microcontrôleur est un 3V3 et ne peut alimenté directement les LM35DZ. De plus dans l'application la dernière ligne avec le Vref ou il est indiqué 5147mV correspond à une approximation avec le résultat du premier pont monitoré avec la branche A0.  
+Ici dans l'image de "La planche à pain avec l'écran", il y a au centre l'écran SPI(5) ST7735 à 80x160 qui marche à l'envers, il y la fonction spécial qui prévoit économisé une Pin de sur le microcontrôleur et utilise conjointement la Pin "Res" sur l'écran est connecté sur le Reset du microcontrôleur. En arrière de l'écran il y a la partie pont de division de courant à base de 2 résistance et de deux condensateur. À gauche du pont principal il y a les deux LM35DZ cadencé avec un transistor ici non visible à cause de la pair de fils violet-bleu-vert vous ne pouvez voir que la résistance de 470 Ohms en dessous de la pair de fils.  À droite totalement sur la planche à pain, la barre d'alimentation avec les ams1117 en format 3V3 et 5V. Le tout est relié à un paquet de batterie 18650 qui sont convertis en alimentation compatible USB ou un 5V. Il va de même que l'alimentation jusqu'à 12V est inclus et donne le même résultats sinon un plus grand décalage à cause qu'il y a plus de stress pour convertir la tension en 3V3 et 5V. Noté que le rail du haut ou jonction de courant du haut est à 5V et celle du bas à 3V3. le microcontrôleur LGT8F328 supporte le 3V3 comme le 5V. Le cas échéant nôtre microcontrôleur est un 3V3 et ne peut alimenté directement les LM35DZ. De plus dans l'application la dernière ligne avec le Vref ou il est indiqué 3294.99 mV correspond à une approximation avec le résultat du premier pont monitoré avec la branche A0.  
+
+### Point de vue avec la réalité.
+
+La température n'est pas correct. Ici à l'endroit ou est réalisé les tests la température varie en 23 degré Celsius et 24 degré Celsius. L'image montre pour deux LM35DZ collé côte à côte et indique 28 à 29 degré Celsius. Et j'insiste que les données vont en montant et peuvent dépassé les 30 degré Celsius. Puisque le montage est configuré pour donner de l'information rapidement et est aussi basé à 2 ponts de diviseur de voltage à base de résistances ( 1000 Ohms et 4700 Ohms ). Nous allons expliqué via une démonstration en trois étapes dans le chapitre 6, à travers le sous chapitre 'Pourquoi ça brûle ?' et à travers le sous chapitre 'Énergie de charge des condensateur du pont diviseur 1' , pour estimer qu'à moitié remplis l'application donne quasiment la bonne réponse.   Cependant l'observation dans le sous chapitre 'Si la case Vref sur l'écran n'indique pas le bon voltage ?' n'est que partiel puisque le montage à été accéléré et les résultats s'avère encore inexacte.
  
 ### Précaution à prendre pour la substitution d'un transistor NPN(4).
 
@@ -73,7 +79,7 @@ Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalen
 |    C4-C5      |    2     | 10 nF 6.3-25 V condensateur céramique           |
 |    R1-R3      |    3     | 1 k Ohms Résistance 1/4 de watt                 |
 |    R3-R4      |    2     | 4k7 Ohms Résistance 1/4 de watt                 |
-|    R4-R5      |    2     | 10 ou 20 k Ohms Résistance 1/4 de watt          |
+|    R4-R5      |    4     | 10 ou 20 k Ohms Résistance 1/4 de watt          |
 |    R6         | 1 ou 3   | 470 Ohms Résistance 1/4 de watt                 |
 |    P1         | 1 ou 0   | Planche à pain avec rail (facultative)          |
 |    D1         | 1 ou 0   | Dérive de courant à 3V3 et 5V.                  |
@@ -92,7 +98,7 @@ Le schéma ici présent gracieuseté "Cirkit Designer" est gratuits et si les pi
 
 Les contacts sont en l'air, et est une représentation imagé entre un vrai plan électronique de type ingénieur, mais tous les contacts sont présent. Vous pouvez établir une relation de contact-en-l'air vers planche à pain sans problème. C'est que la représentation planche à pain n'est pas fidèle à la réalité et il faudrait une très grosse planche à pain pour ajouté les 3 ponts de divisions. Et il n'y a tellement pas beaucoup de connexions que la lecture via planche à pain est fastidieuse.
 
-### représentation du schéma
+### Représentation du schéma
 
 
 ![](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_main_circuit.png)
@@ -105,7 +111,8 @@ Reference: https://app.cirkitdesigner.com/project/517cf01c-8466-4958-a5d0-4e3969
 	- Une des raisons pourquoi il est conseillé de connecté une résistance de 10k ou 20k, plus petite elle brûlera avec le temps. Voir les détails de réalisation. 
 
 - Pont Diviseur 2 et 3
-	- Alimente le LM35DZ 1 et 2
+	- Alimente le LM35DZ 1 et 2.
+	- Est basé avec 2 résistances, 1 k Ohms et 4k7 Ohms.
 - Transistor de contrôle
 	- Est le déclencheur qui active ou met en veille les LM35DZ 1 et 2.
 
@@ -140,9 +147,23 @@ La réponse pour le groupe 2 et 3 du pont de division de voltage devrait doné 4
 Deuxièmes fonction importante dans le multimètre est **DC A**. Permettant de réalisé le test suivant qui consiste à alimenté les LM35DZ avec un contrôle d'ampère précis avec le AMS1117-adj et une 10k Ohms et 2x 200 Ohms pour obtenir un jeux de 120u Ampère, le multimètre présent peut indiqué sous la sélection 2m dans la section **DC A** indiquera 0.012 à 0.010 ce qui est apréciable comme précision.
  
 ### Logiciel à utiliser
+
  Le logiciel en mode texte ou terminal du type arduino-cli est important. Dans la version développé ici est conçu pour utiliser une table de #define(20) qui ont tous une valeur par défaut. En utilisant l'application arrayBuilder en mode graphique vous pouvez extraire les valeurs des différents #define et les transposé dans Arduino-IDE(21) vous même. Ici il y a des valeur à changés et implique une ou plusieurs recompilation de l'application et la transmettre à nouveau au microcontrôleur. il vous faudra aussi avrdude(22) qui est important à utilisé. Tous est déjà expliqué dans la branche de l'application  précédente LGT8F328/ST7735RotaryBtnEx 
 
+### Librairie utilisées
+Voici les librairie utilisées, ceci inclus la librairie de gestion de l'écran qui dépendent du systèmes Adafruit et du protocol SPI. Wire est toujours ajouté dès que Adafruit est utilisé.  Le coeur arduino est bel et bien lgt8fx:avr version 2.0.7 conçu par David Buezas. 
+
+|   Librairie utilisées                | Version |
+|--------------------------------------|---------|
+|   SPI                                | 1.0     |
+|   Adafruit GFX Library               | 1.12.4  |
+|   Adafruit BusIO                     | 1.17.4  |
+|   Wire                               | 1.0     |
+|   Adafruit ST7735 and ST7789 Library | 1.11.0  |
+
+
 ### Utilisation visuel de arrayBuilder 
+
 Ici, il y a une mise à jour de arrayBuilder vous permettant quelques opération via des fenêtres modal à réponse et a résultat. La fonction n'est pas encore officiellement fini en mode visuel, mais permet l'utilisation à travers le terminal.
 
 Dans le cadre de visualisé les #define ajouté à une ligne standard de compilation via arduino-cli vous pouvez tout capturer ainsi:
@@ -299,11 +320,39 @@ Selon la définition de Watt qui représente Joule par seconde (J/s) Si le E de 
 
 0.001088 Coulombs / 0.00100 secondes = 1.088 Watts et des résistance en série reste avec le même potentiel de résistance 1/4 Watts, soit le montage du pont de division 1 ici présent prouve que l'effort génère 1.088 Watts ce qui est beaucoup pour 2 résistances en série de 1/4 de Watt.
  
-## 7. 
-[PARA]
+ ### Pourquoi la température n'est pas la bonne ?
 
-## 8. 
-[PARA]
+Suite à l'observation dans le sous chapitre 'Point de vue avec la réalité', les résultats ne sont pas concluant. Mais avec le sous chapitre précédent, nous avons calculé la charge de plus de 1.088 Watts pour deux résistances expliquant pourquoi deux résistances peuvent brulées. Est-ce que le pont diviseur 2 et 3 serait trop petit et développerait une condition de stress électrique ? Alors retirez les résistances 1.0 k Ohms et 4.7 k Ohms et remplacés-les par 2.2 k Ohms et 10 k Ohms. Toujours sur la trame 5V.
+
+![Nouvelle configuration](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/new_divider.png)
+Après 2 minutes voici le résultat:
+![Nouvelle configuration](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-6.png)
+
+Beaucoup plus proche de la réalité, cependant les résultats varient encore. Question, doit-on utiliser des résistances à plus petite valeur ou à plus grande valeur pour réduire le stress électrique ? 
+## 7. Le facteur de stress électrique.
+
+Oui, le stress électrique existe. Il existe dans les alimentation à découpage appelé SMPS(25), elle existe dans les lampes à flash intensifié et dans les charges rapide à alimentation PD(26). Elles ont toutes comme conséquences de devenir chaud. Ainsi que certains montage électrique mal mesuré. Adverse comme réalité dans le cas de montage électrique mal mesuré une composante va faillir. Tandis que les SMPS, les charge PD et les transfert d'énergie par magnétisme utilisent un mode de fréquence et implique un temps d'arrêt. 
+
+Suite à la question du chapitre 6 voici la réponse.
+
+La réponse est: 
+- Il faut utiliser les plus grandes valeurs possibles puisqu'à 2.2 k Ohms et 10 k Ohms il y a encore une accumulation de stress et celle ci se voit par la non conformité de la relation entre la température ambiante et les résultats à l'écran.
+
+Utilisons à nouveau le calcul de division de voltage à base de résistance: **Vout = (Vs * R2)/( R1 + R2 )**
+Ouvrant un paquet de 600 résistances 1/4 Watts ce ne sont pas des résistances de 1 Ohms à 1 Méga Ohms, mais de 10 Ohms à 1 Méga Ohms, voici la liste des résistances. Quel autre assortiment de résistances la plus haute pourrait même empêché la tension de faire hausser la température indiqué par le LM35DZ et causé l'effet de stress ? 
+
+Voici la liste:
+10, 22, 47, 100, 150, 200, 220, 1k, 2k, 2.2k, 3.3k, 4.7k, 5.1k, 6.8k, 10k, 20k, 47k, 51k, 68k, 100k, 220k, 300k, 470k, 680k, 1M .
+
+- À 2 fois plus élevé que la dernière série proposé il y aurait 4k7 Ohms et 20 k Ohms.
+	-	Vout = ( 5 * 20000)/( 4700 + 20000)
+	-	Vout = 4.004V .
+- Une très grosse paire, 220k Ohms et 1M Ohms.
+	- Vout = ( 5 * 220000)/( 220000 + 1000000)
+	- Vout = 4.098V . 
+
+## 8. Exercices supplémentaire.
+
 ## 9. 
 
 ## 10. 
@@ -337,5 +386,5 @@ note:
 - (22) : avrdude         : AVRDUDE (AVR Downloader/Uploader) est un utilitaire en ligne de commande gratuit et open source utilisé pour programmer les mémoires intégrées des microcontrôleurs AVR de Microchip (anciennement Atmel).
 - (23) : ls              : Commande sous Linux sh / bash, défile la liste des fichiers et génère de l'information associé aux fichiers tels l'espace requis.
 - (24) : Vref            : Diminutif pour Voltage Référence.
-
-
+- (25) : SMPS            : Une **SMPS** (_Switched-Mode Power Supply_ ou alimentation à découpage) est un type de bloc d'alimentation électronique qui convertit et régule le courant électrique de manière très efficace.
+- (26) : PD              : La **technologie PD** est le protocole intelligent qui gère le transfert rapide d'énergie ; un câble ou un port USB-C ne garantit donc pas automatiquement la compatibilité Power Delivery.
