@@ -1,7 +1,7 @@
 
 ## Application SPILM35Ex.ino
 
-l'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino(1) est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliquer le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de tests. Et ayant ajouté plusieurs commodités à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de condensateur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO(2), ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
+L'application ici présente à pour but de corriger un problèmes à l'intérieur du code Arduino de la même branche (LGT8F328), ou l'application LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino(1) est équipé d'un communicateur I2C, un bouton poussoir et rotatif et un écran SPI de la même nature que l'application ici. Il y a un léger bug au niveau de la prise de température et après avoir développé le laboratoire pour expliquer le fonctionnement du LM35DZ. Ce n'est pas le bon matériel nécessaire pour capturer via une sonde avec LM35DZ à vrai dire sur le marché de détail il n'y a pas de sonde à base de LM35DZ, il n'y a que les thermistors et le DS18B20 qui ne font pas encore objet de tests. Et ayant ajouté plusieurs commodités à la communication I2C qui semble bien répondre avec une interface python et d'un ESP32 avec micro-python, ici il n'y a que la démonstration d'un temps d'arrêts et de lecture. Ainsi qu'une analyse de la charge et temps de charge en coulomb d'un pont diviseur à base de résistance et de condensateur. j'ai des images d'une résistance trop base et les effets sur le temps à ajouté qui influent aussi sur la température du montage. Possible qu'une mauvaise configuration dans le schéma de montage puisse indiqué la température de l'élément qui force le plus et non juste la température idéal dans environnement. La faute d'indiqué un si haut voltage serait en fait la température et le stress soumis à la pièce qui aliment ma planche à pain, le LDO(2), ou le ams-1117 en format 3v3 et 5v à la droite sur l'image (La planche à pain avec l'écran). Une prise de température avec un appareil à guidage laser montre les deux pièce être supérieur à 40 degré Celsius et serait le stress final pourquoi le LD35DZ indique la même température. 
 
 
 Table des matières :
@@ -11,9 +11,9 @@ Table des matières :
  3. Liste du matériel.
  4. Plan de construction Arduino à Suivre.
  5. Outils nécessaire pour la réalisation de l'application.
- 6. Les détails de réalisation.
- 7. 
- 8. 
+ 6. Les détails de réalisations.
+ 7. Le facteur de stress électrique.
+ 8. Exercices supplémentaire.
  9. 
  10. 
 
@@ -45,7 +45,7 @@ Le LM35DZ, celui qui ne dépend pas de la calibration du voltage de Vout et Gnd 
 
 L'activité proposé ici donne 2 avantages, l'utilisation du transistor NPN(4) pour basculer du voltage secondaire à base de 5 Volts et de calibrer la sortie avec un pont de division à base de résistance.
 
-Ici les pont 2 et 3 sont à base de résistances 1 k Ohms et 4.7 k Ohms   
+Ici les pont 2 et 3 sont à base de résistances 1 k Ohms et 4.7 k Ohms.   
 
 ![La planche à pain avec l'écran](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-3.png)
 
@@ -274,7 +274,7 @@ Réponse:
 
     -DSAMPLING_READ=500 -DSLEEP_READING=30
 
-Il y a 500 lectures qui constitue le phénomène de statistique standard du nombre d'échantillons collecté pour avoir un résultats décent. Dans l'application présente ou à la ligne Vref(24) présente 2584.81 mV n'avait que 100 lecture et la moitié de la valeur de repos. Donnant comme variable:
+Il y a 500 lectures qui constituent une statistique du nombre d'échantillons collecté pour avoir un résultats décent. Dans l'application présente ou à la ligne Vref(24) présente 2584.81 mV n'avait que 100 lecture et la moitié de la valeur de repos. Donnant comme variable:
 
 **bash**
 
@@ -292,7 +292,7 @@ Il y a 2 condensateurs à chargés donc:
 - À 10 K Ohms , le temps de charge passe à 	2.00 secondes.
 - À 20 K Ohms, le temps de charge passe à 4.00 secondes
 
-Alors, 500 valeurs sont court pour considérer la première valeur intacte. Autre possibilité. Dans la section setup() ou commence la déclaration des Branche à configurer en mode LECTURE ou ÉCRITURE, il faut ajouté plus de temps à la commande delay() pour obtenir une valeur uniforme ou le microcontrôleur aurait déjà eu le temps nécessaire pour stabiliser la charge et commencer à opérer. N'oubliez pas Les ponts de division 1 à 3 sont directement connectés au voltage de de la planche à pain. Mais aussi c'est le transistor qui dépend du microcontrôleur et est déconseillé de monitoré le voltage de l'un des pont 1 et 2 puisqu'ils sont réveillé avant la pratique de l'échantillonage et endormis de 1 à 3 secondes après échantillonnage. 
+Alors, 500 valeurs sont courts pour considérer la première valeur intacte. Autre possibilité. Dans la section setup() ou commence la déclaration des Branche à configurer en mode LECTURE ou ÉCRITURE, il faut ajouté plus de temps à la commande delay() pour obtenir une valeur uniforme ou le microcontrôleur aurait déjà eu le temps nécessaire pour stabiliser la charge et commencer à opérer. N'oubliez pas Les ponts de division 1 à 3 sont directement connectés au voltage de de la planche à pain. Mais aussi c'est le transistor qui dépend du microcontrôleur et est déconseillé de monitoré le voltage de l'un des pont 1 et 2 puisqu'ils sont réveillé avant la pratique de l'échantillonage et endormis de 1 à 3 secondes après échantillonnage. 
 
 Dans la liste du matériel il est inscrit un nombre supplémentaire de résistance de 470 Ohms, pouvant être une alternative. Combien de temps de charge cela prendra-t-il ?   
 
@@ -355,8 +355,32 @@ Voici la liste:
 
 ## 8. Exercices supplémentaire.
 
-## 9. 
+Maintenant grâce à la composante LDO du nom de LM317-ADJ ou de la puce AMS1117-ADJ, vous pouvez réaliser un contrôle sur l'ampérage. Il y a la tension et l'ampérage lorsque nous utilisons l'électron à des fin de contrôle et de conditionnement des composantes électrique et électronique, le courant ou ampérage représente 1 Coulomb par seconde. La composante LM35DZ consomme 60uA et deux LM35DZ consommeront 120uA. la loi de contrôle d'ampérage dans le LM317 est généralisé par : 
 
+Équation :**Iout=Vref/R1**
+
+| Symbole| Définition                          |
+|--------|-------------------------------------|
+|   Iout |  Ampérage de sortie                 |
+|   Vref |  Voltage de référence interne       |
+|   R1   |  Résistance de contrôle             |
+
+Vref est normalisé dans tous les LDO et est égale à 1.25V, alors le schéma du LDO fait une vérification à quel vitesse descendra en dessous de 1.25 pour pratiquer une hausse de tension interne jusqu'à ré-obtenir le voltage de référence.
+
+- Alors Iout doit égaler 0.12 milli Ampère ou 120 uA, et avec un voltage de référence de 1.25 Volts il faut une résistance Iout = Vref/R1 .
+- R1 =  10416.7 Ohms, selon la liste de résistances disponible je ne peux qu'utiliser 1 x 10 k Ohms, 2 x 200 Ohms et j'omets de mettre une quatrième résistance de 10 Ohms, donc 10400 Ohms. L'affinité de l'équation confirmera que c'est légèrement au dessus de 120 uA, mais pas 121 uA. 
+
+### Réalisation de l'expérience secondaire
+
+Voici la partie du schéma à accomplir :
+
+![Configuration avec LDO](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/ldo_current_rect.png)
+
+
+
+
+## 9. 
+[PARA]
 ## 10. 
 [PARA]
 
