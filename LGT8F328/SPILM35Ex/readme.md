@@ -369,6 +369,7 @@ Maintenant grâce à la composante LDO du nom de LM317-ADJ ou de la puce AMS1117
 |   Vref |  Voltage de référence interne       |
 |   R1   |  Résistance de contrôle             |
 
+
 Vref est normalisé dans tous les LDO et est égale à 1.25V, alors le schéma du LDO fait une vérification à quel vitesse descendra en dessous de 1.25 pour pratiquer une hausse de tension interne jusqu'à ré-obtenir le voltage de référence.
 
 - Alors Iout doit égaler 0.12 milli Ampère ou 120 uA, et avec un voltage de référence de 1.25 Volts il faut une résistance Iout = Vref/R1 .
@@ -403,9 +404,11 @@ N'oublions pas que j'ai utilisé un transistor dans l'équation et qu'une questi
 À la liste principale vous prenez les 2 diodes 1n4007 rectifiant. Elles n'ont pas été mentionné nulle part, alors vous enlevé les fils de connexions entre la sortie des série de résistance de contrôle vers les LM35DZ et vous les remplacez par une diode. Il y a deux fils de connexions.
 
 Schéma à suivre :
+
 ![Résultat avec LDO](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_diode_w_ldo.png)
 
 Image du résultat:
+
 ![Résultat avec LDO et diode](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-8.png)
 
 Ce n'est pas plus près de la réalité ? N'est pas qu'avec 0.08 degré Celsius entre A2t ( LM35DZ-2) et et la ligne 'Temp', noté que la température dans la pièce est de 24.5 degré Celsius et il y a un courant d'air d'une rare et chaude journée du mois d'Octobre. Demain matin je m'attend que la température soit encore à 30 et + degré Celsius sans courant d'air et reduira à 24-25 dans le cas ou j'ouvre la fenêtre. Il devrait en être avec la même réalité en classe ou lorsqu'elle est pleine affichera un potentiel beaucoup plus élevé par la présence de chaleur dégagé par les étudiants et une fois vide des étudiants elle se raprochera de la moyenne qu'un thermomètre de type I2C tel le BMP280, non I2C le DHT11 ou DHT22, ou même le AMT2202.    
