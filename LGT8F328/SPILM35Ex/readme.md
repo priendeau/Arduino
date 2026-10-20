@@ -14,8 +14,10 @@ Table des matières :
  6. Les détails de réalisations.
  7. Le facteur de stress électrique.
  8. Exercices supplémentaire.
- 9. 
- 10. 
+ 9. Le monde formidable de Arduino.
+ 10. Conclusion.
+ 11. Référence
+
 
 ## 1. Le LM35 et sa condition.
 
@@ -36,7 +38,7 @@ Ici dans le diagramme il y à gauche le schéma interne du LM35 et à droite le 
 
 L'activité à pour but de qualifié si vous cherchez de prendre la température via une sonde ou une prise générale de la température. Vous pouvez passez à travers une grande quantité de LM35DZ, les 5 spécimens testé donne des résultats plus haut que prévue, mais quelque fois donne vraiment la bonne température. Les conditions lors de l'écriture de l'activité était en automne et les journées froides et sombres sont plus fidèle de reflété une température au thermostat et les journées humide et ensoleillés ont donnés des résultats élevés. Cependant entre la section ombragé de la maison et la section sous-sols donne des résultats élevés et pourtant le solarium ou il devrait faire la température indiqué sur l'écran semble valide, mais n'a pas changé de son démarrage dans le sous-sol. Alors les conditions internes sont absolument géré par la présence du soleil et l'énergie total disponible dans environnement sous ensoleillement. Il va de pair que la méthodologie à l'intérieur du LM35 ne fait qu'un calcul de d'évidement entre un gros transistor 10x plus puissant que celui qui récrimine et réalimente la valeur de base à 1.38 volts (voir le schéma LM35DZ). 
 
-### Domaine d'hypothèse. 
+### Domaine d'hypothèses. 
 
 Comparé avec une recharge sans-fil appelé par induction certaines montre moderne nécessite une recharge par induction et sont extrêmement chaude suite à l'induction du voltage et le capteur de voltage. Descendre la chaleur résiduelle pour éviter que la montre soit brûlante, implique que le chargeur devrait être équipé d'un évaluateur de passage d'énergie et entre dans le domaine du LM35. Travaillant avec le phénomène de charge et d'impulsion une charge rapide impliquerait aussi d'injecté à plus haute fréquence l'impulsion et génèrerait plus de courant en passage. Le LM35 conditionnerait l'empêchement d'atteindre des valeurs qui brûle l'utilisateur ou de faire fondre le plastique de la montre. Cette idée démontré serait issue de quel facteur dans un circuit électrique.  
   
@@ -67,30 +69,32 @@ Le montage initiale est bel et bien avec un transistor 2n2222, qui est polyvalen
 ## 3. Liste du matériel.
 
 **Schéma initiale**
-|     Nom       | Quantité |           Description des éléments              |        
-|---------------|----------|-------------------------------------------------|
-|    U1         |    1     | LGT8F328 QFN32 sur plaquette                    |
-|    U2         |    1     | ST7735 80x160 pixel 65k/282k couleur            |
-|    U3         |    2     | LM35DZ                                          |
-|    U4         |    1     | FTDI-232 USB/TTL loadeur                        |
-|    T1         |    1     | 2n2222 NPN transistor ou le BC337               |
-|    C1         |    1     | 470 uF, 6.3 V condensateur polarisé             |
-|    C2-C3      |    2     | 100 uF 6.3-25 V condensateur polarisé           |
-|    C4-C5      |    2     | 10 nF 6.3-25 V condensateur céramique           |
-|    R1-R3      |    3     | 1 k Ohms Résistance 1/4 de watt                 |
-|    R3-R4      |    2     | 4k7 Ohms Résistance 1/4 de watt                 |
-|    R4-R5      |    4     | 10 ou 20 k Ohms Résistance 1/4 de watt          |
-|    R6         | 1 ou 3   | 470 Ohms Résistance 1/4 de watt                 |
-|    P1         | 1 ou 0   | Planche à pain avec rail (facultative)          |
-|    D1         | 1 ou 0   | Dérive de courant à 3V3 et 5V.                  |
+|     Nom       | Quantité |           Description des éléments               |        
+|---------------|----------|--------------------------------------------------|
+|    F1-F20     |   20 +   | Fil de connexion de planche à pain avec aiguille |
+|    U1         |    1     | LGT8F328 QFN32 sur plaquette                     |
+|    U2         |    1     | ST7735 80x160 pixel 65k/282k couleur             |
+|    U3         |    2     | LM35DZ                                           |
+|    U4         |    1     | FTDI-232 USB/TTL loadeur                         |
+|    T1         |    1     | 2n2222 NPN transistor ou le BC337                |
+|    C1         |    1     | 470 uF, 6.3 V condensateur polarisé              |
+|    C2-C3      |    2     | 100 uF 6.3-25 V condensateur polarisé            |
+|    C4-C5      |    2     | 10 nF 6.3-25 V condensateur céramique            |
+|    R1-R3      |    3     | 1 k Ohms Résistance 1/4 de watt                  |
+|    R3-R4      |    2     | 4k7 Ohms Résistance 1/4 de watt                  |
+|    R4-R5      |    4     | 10 ou 20 k Ohms Résistance 1/4 de watt           |
+|    R6         | 1 ou 3   | 470 Ohms Résistance 1/4 de watt                  |
+|    P1         | 1 ou 0   | Planche à pain avec rail (facultative)           |
+|    D1         | 1 ou 0   | Dérive de courant à 3V3 et 5V.                   |
+|    Di1-Di2    |   2      | Diode 1n4007                                     |
 
 **Expérience secondaire**
 
-|     Nom       | Quantité |           Description des éléments              |        
-|---------------|----------|-------------------------------------------------|
-|    U5         |    1     | AMS-1117-adj ou LM317-ADJ                       |
-|    R6         |    1     | 10 k Ohms Résistance 1/4 de watt                |
-|    R7-R8      |    2     | 200 Ohms Résistance 1/4 de watt                 |
+|     Nom       | Quantité |           Description des éléments               |        
+|---------------|----------|--------------------------------------------------|
+|    U5         |    1     | AMS-1117-adj ou LM317-ADJ                        |
+|    R6         |    1     | 10 k Ohms Résistance 1/4 de watt                 |
+|    R7-R8      |    2     | 200 Ohms Résistance 1/4 de watt                  |
 
 ## 4. Plan de construction Arduino à Suivre.
 
@@ -370,23 +374,52 @@ Vref est normalisé dans tous les LDO et est égale à 1.25V, alors le schéma d
 - Alors Iout doit égaler 0.12 milli Ampère ou 120 uA, et avec un voltage de référence de 1.25 Volts il faut une résistance Iout = Vref/R1 .
 - R1 =  10416.7 Ohms, selon la liste de résistances disponible je ne peux qu'utiliser 1 x 10 k Ohms, 2 x 200 Ohms et j'omets de mettre une quatrième résistance de 10 Ohms, donc 10400 Ohms. L'affinité de l'équation confirmera que c'est légèrement au dessus de 120 uA, mais pas 121 uA. 
 
+À l'exception du LM317 où quelques site internet avertisse que la résistance de contrôle de R1 doit être incluse entrer 0.8 Ohms et 120 Ohms, vous donnera au multimètre 0.01 Ampère. Dans le cas où vous avez une LDO de type AMS1117-ADJ, le multimètre utilisé à la section 'DC A' à la sélection 2m répond à 0.001 mA  ou une précision de 1 uA, avec le 10400 Ohms et ayant peut de contre-indication il s'agit de vérifier.
+
+
 ### Réalisation de l'expérience secondaire
 
 Voici la partie du schéma à accomplir :
 
 ![Configuration avec LDO](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/ldo_current_rect.png)
 
+Le plan total est disponible à l'adresse suivante:
+https://app.cirkitdesigner.com/project/54a6689c-65ce-45d5-971e-fab2b2f24c7c 
+
+Image du résultat:
+
+![Résultat avec LDO](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-7.png)
+
+Les résultats ne sont toujours pas concluant. Non seulement ici vous voyez un résultat élevé, mais après plusieurs secondes, rsultat de hauche à droite, le LM35DZ-2 est plus haut que le LM35DZ-1, et ne conserve pas une valeur stable. Il y a une différence de 5 degré Celsius et semble s'alterné tour à tour ou LM35DZ-1 devient plus haut que le LM35DZ-2. Qu'est-ce qui se passe ? 
+
+Alors il ne suffit pas d'ajouter qu'un rectifieur de courant et puisque nous ne savons pas si la configuration AMS1117-adj est effective, autant imaginer que la vrai limite d'un LDO est de 1 milliampère comme le LM317. Pour une composante avec une consommation de 60 uA nous présageons que le phénomène de reflux existe. Alors Une première composante consome 60uA et retourne .00094 milliampère et laisse la seconde composante avoir plus que la moitié à prendre en courant avec un excès et rapporte une valeur plus élevé. Alors comment éviter qu'une ligne partagé de la sortie de la charge du AMS1117 puisse éviter le reflux ? 
+
+N'oublions pas que j'ai utilisé un transistor dans l'équation et qu'une question se pose est-ce que le voltage circulant d'un transistor pour la sortie pour la masse reçoit d'une composante qui est inductive ?
+
+- Non, à 60uA est est loin d'être inductive. Elle serait possiblement TTL(27). Ceci veut dire qu'il soit possible que la même problématique rencontré avec un autre membre de composantes électronique le 74HC165 dans le laboratoire Arduino/LGT8F328/DrnBtShiftRegPISO(29), un multiplexeur d'entrées de type CMOS(28)/TTL requiert la présence d'une diode que ce soit à 3V3 ou à 5V Puisque la diode rectifiant le courant elle descend la tension à 4.5 Volts à 5V de tension nominal et à 2.7 pour une tension nominal à 3V3, pour la famille des LM35DZ serait de la famille TTL/CMOS nécessitant aussi une diode à chaque entrée de voltage. Le cas échéant à l'application DrnBtShiftRegPISO, ne permettait pas d'activer le premier intérupteur pour la position binaire 0-1, et dès que l'interruption de position 0-1, bloquait l'utilisation de l'interrupteur 128-256 qui est la dernière position parmi les huit possibles combinaisons. Une fois réglé elle pouvait représenté toutes les valeurs de 0 à 255,. Alors serait-il possible que ce soit la même problématique ?
+
+### Dernière partir de la réalisation de l'expérience secondaire.
+
+À la liste principale vous prenez les 2 diodes 1n4007 rectifiant. Elles n'ont pas été mentionné nulle part, alors vous enlevé les fils de connexions entre la sortie des série de résistance de contrôle vers les LM35DZ et vous les remplacez par une diode. Il y a deux fils de connexions.
+
+Schéma à suivre :
+![Résultat avec LDO](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35Ex_diode_w_ldo.png)
+
+Image du résultat:
+![Résultat avec LDO et diode](https://raw.githubusercontent.com/priendeau/Arduino/refs/heads/main/LGT8F328/SPILM35Ex/SPILM35-main-screen-8.png)
+
+Ce n'est pas plus près de la réalité ? N'est pas qu'avec 0.08 degré Celsius entre A2t ( LM35DZ-2) et et la ligne 'Temp', noté que la température dans la pièce est de 24.5 degré Celsius et il y a un courant d'air d'une rare et chaude journée du mois d'Octobre. Demain matin je m'attend que la température soit encore à 30 et + degré Celsius sans courant d'air et reduira à 24-25 dans le cas ou j'ouvre la fenêtre. Il devrait en être avec la même réalité en classe ou lorsqu'elle est pleine affichera un potentiel beaucoup plus élevé par la présence de chaleur dégagé par les étudiants et une fois vide des étudiants elle se raprochera de la moyenne qu'un thermomètre de type I2C tel le BMP280, non I2C le DHT11 ou DHT22, ou même le AMT2202.    
+
+## 9. Le monde formidable de Arduino.
+
+Bienvenue dans le formidable monde de Arduino. N'oubliez pas qu'il n'y a pas d'excellent site web. Que plusieurs site tel arduino.cc contient que des experts et volontaires et n'ont pas réponse à tous. Les expériences mené ici sont en 3V3 et les plaquettes de base Arduino R3 sont en 5 Volts et que 100% de ses experts recommande aux jeunes de rester avec les planches à 5V. Hors la très grande progression des dérivés et de l'expansion des pouvoirs de plaquettes. Plusieurs experts du site web arduino.cc sont muet tant qu'à l'utilisation des plaquette Arduino esp32 avec puce esp32 et mkr1000 avec la puce SAMD21 et avec le débogueur inclus. Que les produits passeront de Atmel, à Qualcom rend encore plus floues la raison d'acheté Arduino Q qui est en 3V3 et possède un ensemble de mini ordinateur de type Raspberry et augmentant le prix de consommation sans avoir de réponses, laisseriez-vous dans les mains de personne ayant peu de connaissance des produits de 200$, pour les voir brûler comme des résistances. Il y a le domaine d'Arduino étant international et de pousser le focus sur les enfants, semble et abstraits, mais aussi de ne pas refléter le mot familles où à l\u2019étude. Offrant que des publicité d'enfants à la maternelle, il y a des calculs qui demande au moins le secondaire pour palier à une utilisation descente. Tout n'est pas pour enfant, mais une fois monté par un adulte les enfants se projèteront dans l'observation ou la simple méthode à obéir avec un outils Arduino monté sur supervision. À vous de décider.
 
 
+## 10. Conclusion
 
-## 9. 
-[PARA]
-## 10. 
-[PARA]
+L'activité à démontré qu'il y a 1 type de thermomètres numérique qui est loin d'être local et à inclure sous format de sonde. Le LM35DZ et les membre similaire sont loin de faire objet d'efficacité sur la précision, mais unique sur ce qui est accumulé et perdu en énergie. Pouvant étroitement lié à la consomation d'énergie, le LM35DZ si connecté individuellement et seulement en contact avec une source externe de chaleur et de refroidissement pourrait ne pas voir la déclinaison ou augmentation de l'énergie. Que la composante inspecté est en corrélation avec l'énergie passant dans la puce et évalue le stress électrique tels un indice proche de la température. À avoir une composante qui génère de la chaleur offrira un stress qui retire beaucoup plus d'énergie de l'environnement et se fera transparaître dans l'énergie dégagé et fera réagir le compteur. Nous pouvons élargir les tests de cette expérience en ajoutant une boîte isolé tels un montage d'analyse thermiques et le LM35DZ établira une relation en joule. Sinon il n'est pas conseillé pour les environnements qui ont une poussé de chaleur et un maintient de la température elle pourrait empêcher le bon fonctionnement d'un frigidaire qui à besoin d'une hausse d'énergie pour congeler l'intérieur et continuer à indiquer une température interne base et stable.
 
-## Réference
-
-
+## 11. Référence
 
 note:
 -	(1) : LGT8F328/ST7735RotaryBtnEx/ST7735RotaryBtnEx.ino ou
@@ -416,6 +449,8 @@ note:
 - (24) : Vref            : Diminutif pour Voltage Référence.
 - (25) : SMPS            : Une **SMPS** (_Switched-Mode Power Supply_ ou alimentation à découpage) est un type de bloc d'alimentation électronique qui convertit et régule le courant électrique de manière très efficace.
 - (26) : PD              : La **technologie PD** est le protocole intelligent qui gère le transfert rapide d'énergie ; un câble ou un port USB-C ne garantit donc pas automatiquement la compatibilité Power Delivery.
+- (27) : TTL            : Un signal TTL (Transistor-Transistor Logic) est un signal numérique binaire standard utilisé dans les circuits électroniques pour représenter un état « activé » (logique 1) ou « désactivé » (logique 0).
+- (28) : CMOS           : Le CMOS (Complementary Metal-Oxide-Semiconductor, ou semi-conducteur métal-oxyde complémentaire) est une technologie de fabrication de circuits intégrés qui utilise des paires symétriques de transistors à effet de champ (MOSFET) de type P et de type N.
+- (29) : Arduino/LGT8F328/DrnBtShiftRegPISO : Laboratoire sur le décalage du multiplexeur disponible à l'adresse suivante: https://github.com/priendeau/Arduino/tree/main/LGT8F328/DrnBtShiftRegPISO
 
-
-
+ 
